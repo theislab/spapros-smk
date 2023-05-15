@@ -2,19 +2,19 @@ import argparse
 import pandas as pd
 import scanpy as sc
 
-# Get input arguments
 def get_args():
+    """Get input arguments"""
     parser = argparse.ArgumentParser(description='Process dataset')
+    
     parser.add_argument('-d', '--data', help='Input h5ad file name', required=True, type=str)
     parser.add_argument('-o', '--output', help='Output h5ad file name', required=True, type=str)
     parser.add_argument('-id', '--id', help='Dataset processing id', required=True, type=int)
     parser.add_argument('-f', '--id_file', help='Csv file with ids and parameter sets', required=True, type=str)
-    #parser.add_argument('-p', '--params', help='Parameters str', required=True)
-
+    
     return parser.parse_args()
 
-
 def main():
+    """Run data processing"""
     args = get_args()
     print(args.data)
     print(args.output)
@@ -38,12 +38,12 @@ def main():
     # Process data
     
     # Save data
+    print(adata)
     adata.write(args.output)
     
 
 
 
 if __name__ == '__main__':
-    
     
     main()
