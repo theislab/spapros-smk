@@ -1,0 +1,64 @@
+
+from ConfigParser import ConfigParser
+
+configfile: './config/config.yaml'
+#configfile: 'configs/config.yaml'
+parser = ConfigParser(config)
+final_files = parser.file_names
+
+#print(parser.data_params_file, flush=True)
+#include: "rules/selection.smk"
+#include: "rules/dataset.smk"
+
+
+
+# Plan:
+# - prep one example dataset --> DONE: .../data/adata_test.h5ad (pbmc dataset preped in dev.ipynb)
+# - write dataset snakemake rule: raw dataset is input to snakemake rule (output has multiple layers!)
+  # - dataset prep: do we want to add the different processing methods of specific selection methods?
+# - prep the spapros selection script (include )
+# - and write spapros selection rule (delete the multiple layers)
+# Parser + config tables (selection, dataset), rules, scripts, envs, time/memory measurement
+
+# spapros extension --> exchange pca selection with scmer?
+
+#Ensures dataset and merthod are names not file paths, and ids are ints
+wildcard_constraints:
+    dataset="[^\/]+",
+    method="[^\/]+",
+    data_id="\d+",
+    selection_id="\d+"
+
+
+rule all:
+    input:
+        expand("{results_dir}/{files}", results_dir=config['RESULTS_DIR'], files=final_files)
+        
+        
+
+rule process_data:
+    conda:
+        "envs/base_env.yaml"
+    input:
+        expand("{raw_data_dir}/{{dataset}}.h5ad", raw_data_dir=config['DATA_DIR'])
+    output:
+        temp(expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP']))
+        #temp("{config['DATA_DIR']}/{dataset}_n_cts_{n_cts}_n_per_ct_{n_cells_per_ct}_n_hvgs_{n_genes}_probeconstraint_{0/1}_seed_{seed}.h5ad")
+    params:
+        data_params_file = parser.data_params_file
+    #    #data_params = lambda w: parser.get_data_params(int(w.data_id)),
+    shell:
+        "python workflow/scripts/process_data.py --data {input} -o {output} -id {wildcards.data_id} -f {params.data_params_file}"
+
+
+rule selection:
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/{{method}}_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    log:
+        "logs/selections/{method}_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params = lambda w: parser.get_selection_params(int(w.selection_id)),
+    shell:
+        "python workflow/scripts/selection_{wildcards.method}.py --data {input} -o {output} -p \"{params.selection_params}\""

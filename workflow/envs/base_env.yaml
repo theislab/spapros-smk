@@ -1,0 +1,9 @@
+
+name: base_env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - pip
+  - scanpy=1.9.3

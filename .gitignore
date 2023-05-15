@@ -1,3 +1,10 @@
+# additional
+.snakemake/
+.DS_Store
+logs/
+results/
+*/dev_*.ipynb
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

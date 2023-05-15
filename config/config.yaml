@@ -1,0 +1,64 @@
+
+# when using relative paths: note that the working directory is the pwd of the terminal from where snakemake is run, 
+# this should be .../spapros-smk  (also possible: .../spapros-smk/workflow, might mess things up though)
+DATA_DIR: ../data
+DATA_DIR_TMP: ../data/tmp_data
+RESULTS_DIR: results
+
+selections:
+  batch_test:
+    datasets: [adata_test]
+    selection_param:
+      n: [50,75]  #,100,150]
+    methods:
+      #spapros
+      DE
+#  batch1:
+#    datasets: [sc_mouse_brain]
+#    selection_param:
+#      n: [50,75,100,150]
+#    methods:
+#      spapros
+#      nsforest
+#      scmer
+#      DE
+#  batch1.2:
+#    datasets: [sc_mouse_brain]
+#    dataset_param:
+#      cells_per_ct: [50,100,200,500,1000,None]
+#    selection_param:
+#      n: [50,150]
+#    methods:
+#      spapros
+#  batch2:
+#    datasets: [Mad, Lit]
+#    selection_param:
+#      n: [50,150]
+#    methods:
+#      geneBasis
+#  batch2.2:
+#    datasets: [Mad, Lit]
+#    selection_param:
+#      n: [50,150]
+#      gene_key: ["hvg_probe_constraint"]
+#    methods:
+#      spapros
+#  batch3:
+#    datasets: [HLCA]
+#    selection_param:
+#      n: [50,150]
+#      ct_key: ["annotation_level1","annotation_level2","annotation_level3","annotation_level4","annotation_level5"]
+#    methods:
+#      spapros
+#  batch4:
+#    datasets: [Mad, Mey, Lit, mouse_sc]
+#    dataset_param:
+#      n_cts : [...]
+#      cells_per_ct : [...]
+#      cells_per_ct_n_seeds : [10]
+#    selection_param:
+#      n: [50,150]
+#    methods:
+#      spapros
+    #param_link: 
+    #  dataset_param-cells_per_ct: methods-spapros-
