@@ -1,7 +1,7 @@
 import argparse
 import pandas as pd
 import scanpy as sc
-from scipy.sparse import issparse, csr_matrix
+from scipy.sparse import issparse, csr_matrix, sparsefuncs
 
 def get_args():
     """Get input arguments"""
@@ -31,7 +31,7 @@ def main():
     processing = str(params["processing"]) if params["processing"] != "None" else None
     ct_key = params["ct_key"] if params["ct_key"] != "None" else None
     n_cts = int(params["n_cts"]) if params["n_cts"] != "None" else None
-    cells_per_ct_n_seeds = int(params["cells_per_ct_n_seeds"]) if params["cells_per_ct_n_seeds"] != "None" else None
+    cells_per_ct_seed = int(params["cells_per_ct_seed"]) if params["cells_per_ct_seed"] != "None" else None
     cells_per_ct = int(params["cells_per_ct"]) if params["cells_per_ct"] != "None" else None
     
     # Load data

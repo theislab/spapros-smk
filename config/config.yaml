@@ -5,9 +5,15 @@ DATA_DIR: ../data
 DATA_DIR_TMP: ../data/tmp_data
 RESULTS_DIR: results
 
+#DATA_DIR: ../../data
+#DATA_DIR_TMP: ../../data/tmp_data
+#RESULTS_DIR: ../results
+
 selections:
   batch_test:
     datasets: [adata_test]
+    #dataset_param:
+    #  cells_per_ct_n_seeds : [4]
     selection_param:
       n: [5] #[75]  #,100,150]
       method_specific_processing: [True] #[True, False]
