@@ -26,7 +26,8 @@ rule process_data:
     input:
         expand("{raw_data_dir}/{{dataset}}.h5ad", raw_data_dir=config['DATA_DIR'])
     output:
-        temp(expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP']))
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+        #temp(expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP']))
     params:
         data_params_file = parser.data_params_file
     shell:
@@ -201,3 +202,17 @@ rule selection_selfe: # TODO: if we have it like this we need to adjust the outp
         selection_params_file = parser.selection_params_file
     shell:
         "python workflow/scripts/selection_selfe.R --data {input} -o {output} --method {wildcards.method}  -id {wildcards.selection_id} -f {params.selection_params_file}"
+
+rule selection_genebasis:
+    container:
+        "docker://louisk92/spapros_genebasis:v1.0"
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/genebasis_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    log:
+        "logs/selections/genebasis_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection.py --data {input} -o {output} --method genebasis  -id {wildcards.selection_id} -f {params.selection_params_file}"

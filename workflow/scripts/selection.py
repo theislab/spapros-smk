@@ -76,7 +76,8 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
     """
     """
     
-    adata = adata[:,gene_key]
+    if gene_key is not None:
+        adata = adata[:,gene_key]
     
     # SPAPROS
     if method == "spapros":

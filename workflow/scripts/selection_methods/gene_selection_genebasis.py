@@ -65,8 +65,8 @@ def select_genes_genebasis(n, adata, tmp_dir, #conda_env,
                                                                                    str(npc_all),  # 9
                                                                                    str(" ".join(genes_discard)) if genes_discard is not None else str(None),  # 10
                                                                                    str(" ".join(genes_discard_prefix)) if genes_discard_prefix is not None else str(None),  # 11
-                                                                                   str(verbose),  # 12
-                                                                                   str(conda_env)  # 13
+                                                                                   str(verbose)#,  # 12
+                                                                                   #str(conda_env)  # 13
                                                                                    ])
 
     # example command:

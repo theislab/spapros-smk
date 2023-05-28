@@ -1,8 +1,8 @@
 # wrapper for gene selection with geneBasis
 
 # load libraries
-suppressPackageStartupMessages(library(devtools))
-install_github('MarioniLab/geneBasisR')
+#suppressPackageStartupMessages(library(devtools))
+#install_github('MarioniLab/geneBasisR')
 suppressPackageStartupMessages(library(geneBasisR))
 suppressPackageStartupMessages(library(zellkonverter))
 suppressPackageStartupMessages(library(SingleCellExperiment))
@@ -53,7 +53,7 @@ verbose <- as.logical(args[12])
 if(verbose == "None"){
   verbose <- TRUE
 }
-conda_env <- args[13]
+#conda_env <- args[13]
 
 stat_all <- NULL
 #' @param stat_all If True graph and corresponding Minkowski distances have been calculated prior to search, provide this data here.
@@ -66,9 +66,10 @@ stat_all <- NULL
 # prep_adata_path <- "/big/st/strasserl/gene_selection_methods/parent_dir/selections/tmp/preprocessed_adata.h5ad"
 # output_path <- "/big/st/strasserl/gene_selection_methods/parent_dir/selections/tmp/genebasis_tmp.tsv"
 
-# specify conda env
+## specify conda env
 suppressPackageStartupMessages(library(reticulate))
-use_condaenv(condaenv = conda_env, required = T)
+#use_condaenv(condaenv = conda_env, required = T)
+use_python("/usr/bin/python")
 
 # read input (log normalized HVGs)
 # creates a new conda env in ~/.cache/basilisk/1.2.1/zellkonverter-1.0.3/anndata_env
