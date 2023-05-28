@@ -1,6 +1,8 @@
 import scanpy as sc
 from scipy.sparse import issparse
 from sklearn.utils import sparsefuncs
+import numpy as np
+from sklearn.neighbors import NearestCentroid
 
 
 def normalise(adata, key='size_factors'):
@@ -34,3 +36,26 @@ def preprocess_adata(adata, size_factors="size_factors"):
     sc.pp.log1p(adata)
 
     return adata
+
+
+def performance(n, adata, markers, label="leiden"):
+    if issparse(adata.X):
+        data = adata.copy().X.toarray()
+    else:
+        data = adata.copy().X
+    clf = NearestCentroid()
+    labels = np.array(adata.obs[label])
+
+    clf.fit(data, labels)
+    accuracy = clf.score(data, labels)
+    print("Accuracy (whole data,", data.shape[1], " markers): ", accuracy)
+
+    clf.fit(data[:, markers], labels)
+    accuracy_markers = clf.score(data[:, markers], labels)
+    print("Accuracy (selected", n, "markers)", accuracy_markers)
+
+
+
+
+
+

@@ -7,3 +7,4 @@ channels:
 dependencies:
   - pip
   - scanpy=1.9.3
+  - scipy=1.10.1

@@ -9,10 +9,18 @@ selections:
   batch_test:
     datasets: [adata_test]
     selection_param:
-      n: [50,75]  #,100,150]
+      n: [5] #[75]  #,100,150]
+      method_specific_processing: [True] #[True, False]
     methods:
       #spapros
-      DE
+      #DE
+      #pca
+      #scgenefit
+      #nsforest
+      #scmer
+      smash
+      #asfs
+      #cosg
 #  batch1:
 #    datasets: [sc_mouse_brain]
 #    selection_param:

@@ -6,6 +6,7 @@ import pandas as pd
 
 DEFAULT_PARAMETERS = {
     "dataset": {
+        "processing": None, # options: [None, "lognorm"]
         "ct_key": "celltype", # only relevant if e.g. n_cts is specified
         "n_cts" : None,
         "cells_per_ct_n_seeds" : 1,
@@ -15,6 +16,7 @@ DEFAULT_PARAMETERS = {
         "n": 100,
         "ct_key": "celltype",
         "gene_key": None,
+        "method_specific_processing": False, # wether to use the method specific normalization/filtering etc. 
     },
 }
 
@@ -27,6 +29,7 @@ DEFAULT_PARAMETERS = {
 DEFAULT_PARAMETERS_TYPES = {
     "dataset": {
         "dataset": str, # this one is special as it's separate from the dataset_param
+        "processing": str,
         "ct_key": str, # only relevant if e.g. n_cts is specified
         "n_cts" : int,
         "cells_per_ct_n_seeds" : int,
@@ -37,6 +40,7 @@ DEFAULT_PARAMETERS_TYPES = {
         "n": int,
         "ct_key": str,
         "gene_key": str,
+        "method_specific_processing": bool,
     },
 }
 

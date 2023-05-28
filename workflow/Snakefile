@@ -33,14 +33,171 @@ rule process_data:
         "python workflow/scripts/process_data.py --data {input} -o {output} -id {wildcards.data_id} -f {params.data_params_file}"
 
 
-rule selection:
+#rule selection_py: # spapros, asfs, cosg, nsforest, scmer, triku, smash
+#    input:
+#        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+#    output:
+#        expand("{results_dir}/selection/{{method}}_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+#    conda:
+#        "envs/venv_{method}.yaml"
+#    log:
+#        "logs/selections/{method}_{selection_id}_{dataset}_{data_id}.csv"
+#    params:
+#        selection_params_file = parser.selection_params_file
+#    shell:
+#        "python workflow/scripts/selection.py --data {input} -o {output} --method {wildcards.method}  -id {wildcards.selection_id} -f {params.selection_params_file}"
+        
+rule selection_spapros: 
     input:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
-        expand("{results_dir}/selection/{{method}}_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+        expand("{results_dir}/selection/spapros_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    conda:
+        "envs/venv_spapros.yaml"
     log:
-        "logs/selections/{method}_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/spapros_{selection_id}_{dataset}_{data_id}.csv"
     params:
         selection_params_file = parser.selection_params_file
     shell:
-        "python workflow/scripts/selection_{wildcards.method}.py --data {input} -o {output} -id {wildcards.selection_id} -f {params.selection_params_file}"
+        "python workflow/scripts/selection.py --data {input} -o {output} --method spapros  -id {wildcards.selection_id} -f {params.selection_params_file}"
+
+rule selection_DE: 
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/DE_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    conda:
+        "envs/venv_spapros.yaml"
+    log:
+        "logs/selections/DE_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection.py --data {input} -o {output} --method DE  -id {wildcards.selection_id} -f {params.selection_params_file}"
+        
+rule selection_pca:
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/pca_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    conda:
+        "envs/venv_spapros.yaml"
+    log:
+        "logs/selections/pca_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection.py --data {input} -o {output} --method pca  -id {wildcards.selection_id} -f {params.selection_params_file}"
+
+rule selection_scgenefit: # spapros, asfs, cosg, nsforest, scmer, triku, smash
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/scgenefit_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    conda:
+        "envs/venv_scgenefit.yaml"
+    log:
+        "logs/selections/scgenefit_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection.py --data {input} -o {output} --method scgenefit  -id {wildcards.selection_id} -f {params.selection_params_file}"
+        
+rule selection_nsforest: 
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/nsforest_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    conda:
+        "envs/venv_selection.yaml"
+    log:
+        "logs/selections/nsforest_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection.py --data {input} -o {output} --method nsforest  -id {wildcards.selection_id} -f {params.selection_params_file}"
+        
+rule selection_scmer: # spapros, asfs, cosg, nsforest, scmer, triku, smash
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/scmer_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    conda:
+        "envs/venv_selection.yaml"
+    log:
+        "logs/selections/scmer_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection.py --data {input} -o {output} --method scmer  -id {wildcards.selection_id} -f {params.selection_params_file}"
+
+rule selection_smash: 
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/smash_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    conda:
+        "envs/venv_smash.yaml"
+    log:
+        "logs/selections/smash_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection.py --data {input} -o {output} --method smash  -id {wildcards.selection_id} -f {params.selection_params_file}"
+      
+rule selection_asfs: 
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/asfs_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    conda:
+        "envs/venv_asfs.yaml"
+    log:
+        "logs/selections/asfs_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection.py --data {input} -o {output} --method asfs  -id {wildcards.selection_id} -f {params.selection_params_file}"
+      
+rule selection_cosg:
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/cosg_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    conda:
+        "envs/venv_cosg.yaml"
+    log:
+        "logs/selections/cosg_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection.py --data {input} -o {output} --method cosg  -id {wildcards.selection_id} -f {params.selection_params_file}"
+
+rule selection_triku:
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/triku_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    conda:
+        "envs/venv_triku.yaml"
+    log:
+        "logs/selections/triku_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection.py --data {input} -o {output} --method triku  -id {wildcards.selection_id} -f {params.selection_params_file}"
+      
+# genebasis, scpnmf, selfe
+rule selection_selfe: # TODO: if we have it like this we need to adjust the output files directory for selections in the Parser
+    container:
+        "docker://louisk92/scpnmf:latest"
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection_selfe/selfe_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    log:
+        "logs/selections/selfe_{selection_id}_{dataset}_{data_id}.csv"
+    params:
+        selection_params_file = parser.selection_params_file
+    shell:
+        "python workflow/scripts/selection_selfe.R --data {input} -o {output} --method {wildcards.method}  -id {wildcards.selection_id} -f {params.selection_params_file}"
