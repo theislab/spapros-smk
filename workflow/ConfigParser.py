@@ -109,6 +109,7 @@ class ConfigParser():
         self.DATA_DIR = self.config['DATA_DIR']
         self.DATA_DIR_TMP = self.config['DATA_DIR_TMP']
         self.RESULTS_DIR = self.config['RESULTS_DIR']
+        self.SAVE_METHOD_SPECIFIC_OUTPUT = self.config['SAVE_METHOD_SPECIFIC_OUTPUT']
         
         # Make dirs
         Path(self.DATA_DIR_TMP).mkdir(exist_ok=True)
@@ -363,7 +364,7 @@ class ConfigParser():
             "dataset" : [v for v in PSEUDO_PARAM_TO_PARAM["dataset"].values()],
             "selection" : [v for v in PSEUDO_PARAM_TO_PARAM["selection"].values()],
         }
-        print(config)
+        
         new_config_s = {}
         old_config_s = config["selections"]
         # Iterate over each batch of the configuration
@@ -371,7 +372,6 @@ class ConfigParser():
             new_config_s[batch] = {}
             
             # Copy datasets and methods
-            print(old_config_s[batch])
             new_config_s[batch]["datasets"] = old_config_s[batch]["datasets"]
             new_config_s[batch]["methods"] = old_config_s[batch]["methods"]
             

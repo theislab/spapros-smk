@@ -1,7 +1,8 @@
 import argparse
 import pandas as pd
 import scanpy as sc
-from scipy.sparse import issparse, csr_matrix, sparsefuncs
+from scipy.sparse import issparse, csr_matrix
+from util import normalise, get_highly_variable, subset_to_n_celltypes, sample_n_cells_per_ct
 
 def get_args():
     """Get input arguments"""
@@ -55,38 +56,22 @@ def main():
     else:
         adata.uns["processing"] = "raw"
     
+    # Subset to n cell types
+    if n_cts is not None:
+        adata = subset_to_n_celltypes(adata, n_cts, ct_key=ct_key, exact=False)
+        
+    # Subset each cell type to cells_per_ct
+    if cells_per_ct is not None:
+        adata = sample_n_cells_per_ct(adata, cells_per_ct, ct_key=ct_key, seed=cells_per_ct_seed)
+    
     # Save data
     if not issparse(adata.X):
         adata.X = csr_matrix(adata.X)
     print(adata)
     adata.write(args.output)
     
+                
 
-
-def normalise(adata, key='size_factors'):
-    """Normalise raw counts adata with size factors
-
-    adata: AnnData
-        Contains size factors in adata.obs[key]
-    key: str
-        Key for size factors
-    """
-
-    if issparse(adata.X):
-        sparsefuncs.inplace_row_scale(adata.X, 1 / adata.obs[key].values)
-    else:
-        adata.X /= adata.obs[key].values[:, None]
-
-def get_highly_variable(adata,N=8000,key_added='highly_variable'):
-    """Compute N highly variable genes of given dataset for given normalisation
-    
-    A copy of the raw data is normalised and log1p transformed to extract N highly variable genes.
-    """
-    a = adata.copy()
-    a.X /= a.obs['size_factors'].values[:,None]
-    sc.pp.log1p(a)
-    sc.pp.highly_variable_genes(a, n_top_genes=N, flavor='cell_ranger', inplace=True)
-    adata.var[key_added] = a.var['highly_variable']
 
 
 if __name__ == '__main__':

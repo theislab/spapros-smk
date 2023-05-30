@@ -4,6 +4,7 @@
 DATA_DIR: ../data
 DATA_DIR_TMP: ../data/tmp_data
 RESULTS_DIR: results
+SAVE_METHOD_SPECIFIC_OUTPUT: True # Whether to save method specific output of the selection methods (will be in RESULTS_DIR+"method_specific/{run}/")
 
 #DATA_DIR: ../../data
 #DATA_DIR_TMP: ../../data/tmp_data
@@ -18,13 +19,13 @@ selections:
       n: [5] #[75]  #,100,150]
       method_specific_processing: [True] #[True, False]
     methods:
-      #spapros
+      spapros
       #DE
       #pca
       #scgenefit
       #nsforest
       #scmer
-      smash
+      #smash
       #asfs
       #cosg
 #  batch1:

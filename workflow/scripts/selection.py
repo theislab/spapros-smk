@@ -1,10 +1,11 @@
 import os
+import time
 from pathlib import Path
 import sys
 import argparse
 import pandas as pd
 import scanpy as sc
-from util import preprocess_adata
+from util import preprocess_adata, get_selection_df
 
 
 
@@ -19,6 +20,7 @@ def get_args():
     parser.add_argument('-m', '--method', help='Selection method', required=True, type=str)
     parser.add_argument('-id', '--id', help='Selection id', required=True, type=int)
     parser.add_argument('-f', '--id_file', help='Csv file with ids and parameter sets', required=True, type=str)
+    parser.add_argument('-s', '--save_specific_output', help='Save method specific output', required=False, type=str, default="False")
     
     return parser.parse_args()
     
@@ -34,6 +36,7 @@ def main():
     selection_id = args.method + "_" + str(args.id)
     selection_csv = Path(args.output)
     info_csv = Path(args.output.replace(".csv","_info.csv"))
+    save_specific_output = args.save_specific_output in ["True", True]
     
     # Get parameters
     params = pd.read_csv(args.id_file, index_col=0)
@@ -58,7 +61,10 @@ def main():
         adata = adata[:,adata.var[gene_key]]
     
     # Run selection
-    selection, computation_time = run_selection(args.method, adata, n, ct_key, gene_key, proc, kwargs, selection_csv)
+    selection, computation_time = run_selection(
+        args.method, adata, n, ct_key, gene_key, proc, kwargs, 
+        selection_csv, save_specific_output=save_specific_output
+    )
     
     # Save selection
     df_selection = pd.DataFrame(index=adata.var.index, data={selection_id:False})
@@ -72,12 +78,15 @@ def main():
     df_info.to_csv(info_csv)
     
     
-def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_csv):
+def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_csv, save_specific_output=False):
     """
     """
     
     if gene_key is not None:
         adata = adata[:,gene_key]
+        
+    tmp_dir = Path(selection_csv.parent.parent , "tmp", selection_csv.stem)
+    specific_dir = Path(selection_csv.parent.parent , "method_specific", selection_csv.stem)
     
     # SPAPROS
     if method == "spapros":
@@ -86,23 +95,40 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
             adata = preprocess_adata(adata)
         kwargs["n_min_markers"] = 0
         kwargs["genes_key"] = gene_key
+        if save_specific_output:
+            kwargs["save_dir"] = specific_dir
+            
         selector = sp.se.ProbesetSelector(adata,ct_key,n=n,**kwargs,verbosity=0,n_jobs=-1)
+        start = time.time()
         selector.select_probeset()
-        selection = selector.probeset
+        computation_time = time.time() - start
+        
+        selection = get_selection_df(adata, selector.probeset.loc[selector.probeset["selection"]].index.tolist())
+        
     
     # PCA
     elif method == "pca":
         import spapros as sp
         if proc:
-            adata = preprocess_adata(adata)        
+            adata = preprocess_adata(adata)
+            
+        start = time.time()
         selection = sp.se.select_pca_genes(adata, n, inplace=False, verbosity=0, **kwargs)
+        computation_time = time.time() - start
+        
+        selection = get_selection_df(adata, selection.loc[selection["selection"]].index.tolist())
     
     # DE
     elif method == "DE":
         import spapros as sp
         if proc:
-            adata = preprocess_adata(adata)        
+            adata = preprocess_adata(adata)
+            
+        start = time.time()
         selection = sp.se.select_DE_genes(adata, n, obs_key=ct_key, inplace=False, verbosity=0, **kwargs)
+        computation_time = time.time() - start
+        
+        selection = get_selection_df(adata, selection.loc[selection["selection"]].index.tolist())
     
     # SCGENEFIT
     elif method == "scgenefit":
@@ -170,7 +196,6 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
         from selection_methods.gene_selection_genebasis import select_genes_genebasis
         if proc:
             adata = preprocess_adata(adata)
-        tmp_dir = Path(selection_csv.parent.parent , "tmp", selection_csv.stem)
         tmp_dir.mkdir(parents=True, exist_ok=True)
         #tmp_dir = os.path.join(out_dir, "tmp")
         #conda_env = config["venv"]
