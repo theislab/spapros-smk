@@ -258,10 +258,9 @@ rule selection_triku:
         "-f {params.selection_params_file} "
         "-s {params.save_method_specific_output}"
       
-# genebasis, scpnmf, selfe
-rule selection_selfe: # TODO: if we have it like this we need to adjust the output files directory for selections in the Parser
+rule selection_selfe: 
     container:
-        "docker://louisk92/scpnmf:latest"
+        "docker://louisk92/spapros_selfe:v1.0"
     input:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
@@ -272,10 +271,10 @@ rule selection_selfe: # TODO: if we have it like this we need to adjust the outp
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
     shell:
-        "python workflow/scripts/selection_selfe.R "
+        "python workflow/scripts/selection.py "
         "--data {input} "
         "-o {output} "
-        "--method {wildcards.method} "
+        "--method selfe "
         "-id {wildcards.selection_id} "
         "-f {params.selection_params_file} "
         "-s {params.save_method_specific_output}"

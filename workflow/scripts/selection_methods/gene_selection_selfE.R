@@ -1,19 +1,19 @@
 # this is a script that can be invoked from the python wrapper to do gene selection with the R package scPNMF
 # for infos on the arguments ets see docstrings of the python wrapper
 
-# Set libPaths for jobs on icb cluster
-if (.libPaths() == "/opt/R/lib/R/library") {
-    .libPaths(c("/home/louis.kuemmerle/bin",.libPaths()))
-}
+## Set libPaths for jobs on icb cluster
+#if (.libPaths() == "/opt/R/lib/R/library") {
+#    .libPaths(c("/home/louis.kuemmerle/bin",.libPaths()))
+#}
 
 # load libraries
 suppressPackageStartupMessages(library(reticulate))
-if (.libPaths()[1] == "/home/louis.kuemmerle/bin") {
-    #use_python("/opt/python/bin/python")
-    #use_python("/opt/python/bin/python3")
-    #use_python("/opt/python/lib/python3.8")
-    use_python("/home/louis.kuemmerle/.local/share/r-miniconda/envs/r-reticulate/bin/python")
-}
+#if (.libPaths()[1] == "/home/louis.kuemmerle/bin") {
+#    #use_python("/opt/python/bin/python")
+#    #use_python("/opt/python/bin/python3")
+#    #use_python("/opt/python/lib/python3.8")
+#    use_python("/home/louis.kuemmerle/.local/share/r-miniconda/envs/r-reticulate/bin/python")
+#}
 
 
 # parse arguments
@@ -21,7 +21,8 @@ args <- commandArgs(trailingOnly = TRUE)
 n <- as.integer(args[1])
 prep_adata_path <-  args[2]
 output_path <- args[3]
-conda_env <- args[4]
+dir_of_script <- args[4]
+#conda_env <- args[4]
 
 ## example:
 # n <- 25
@@ -49,7 +50,7 @@ lapply(
 input <- read_h5ad(prep_adata_path)
 
 # load gene selection method
-source("selection_methods/SelfE.R")
+source(paste0(dir_of_script,"/SelfE.R"))
 
 # selected_genes: indices one-based
 selected_genes <- SelfE(input$X, n)

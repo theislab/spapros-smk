@@ -10,10 +10,10 @@
 # @examples
 # GeneID = SelfE(Data, 50)
 
-# Set libPaths for jobs on icb cluster
-if (.libPaths() == "/opt/R/lib/R/library") {
-    .libPaths(c("/home/louis.kuemmerle/bin",.libPaths()))
-}
+## Set libPaths for jobs on icb cluster
+#if (.libPaths() == "/opt/R/lib/R/library") {
+#    .libPaths(c("/home/louis.kuemmerle/bin",.libPaths()))
+#}
 
 SelfE <- function(data, k)
 {

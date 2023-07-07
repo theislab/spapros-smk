@@ -214,20 +214,21 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
                                                              #conda_env=conda_env,
                                                              **kwargs)
     
-    ## selfE
-    #elif method == "selfe":
-    #    from selection_methods.gene_selection_selfe import select_genes_selfe
-    #    tmp_dir = os.path.join(out_dir, "tmp")
-    #    conda_env = config["venv"]
-    #    if not os.path.exists(tmp_dir):
-    #        os.umask(0)
-    #        os.makedirs(tmp_dir, 0o777)
-    #        os.chmod(tmp_dir, 0o777)
-    #    selection, computation_time = select_genes_selfe(n=n,
-    #                                                     adata=adata,
-    #                                                     tmp_dir=tmp_dir,
-    #                                                     conda_env=conda_env,
-    #                                                     **kwargs)
+    # selfE
+    elif method == "selfe":
+        from selection_methods.gene_selection_selfe import select_genes_selfe, preprocess_adata_selfe
+        if proc:
+            adata = preprocess_adata_selfe(adata, subsample=10000)
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+        #conda_env = config["venv"]
+        #if not os.path.exists(tmp_dir):
+        #    os.umask(0)
+        #    os.makedirs(tmp_dir, 0o777)
+        #    os.chmod(tmp_dir, 0o777)
+        adata_path = os.path.join(tmp_dir, "adata_tmp.h5ad")
+        adata.write(adata_path)
+        r_exe = "Rscript" #"/usr/bin/Rscript"        
+        selection, computation_time = select_genes_selfe(n, adata_path, tmp_dir, r_exe)
 
     # COSG
     elif method == "cosg":
