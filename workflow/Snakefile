@@ -264,7 +264,7 @@ rule selection_selfe:
     input:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
-        expand("{results_dir}/selection_selfe/selfe_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+        expand("{results_dir}/selection/selfe_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
     log:
         "logs/selections/selfe_{selection_id}_{dataset}_{data_id}.csv"
     params:
