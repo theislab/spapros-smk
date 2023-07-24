@@ -63,6 +63,7 @@ selections:
 #    selection_param:
 #      n: [50,150]
 #      ct_key: ["annotation_level1","annotation_level2","annotation_level3","annotation_level4","annotation_level5"]
+#               transf_ann_level_1_label, transf_ann_level_2_label, transf_ann_level_3_label, transf_ann_level_4_label, transf_ann_level_5_label
 #    methods:
 #      spapros
 #  batch4:

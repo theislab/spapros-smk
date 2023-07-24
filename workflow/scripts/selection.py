@@ -150,18 +150,23 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
         selection, computation_time = gene_selection_nsforest(n, adata=adata, label=ct_key, **kwargs)  # int(np.ceil(n / n_clust))
 
     ## SCPNMF
-    #elif method == "scpnmf":
-    #    from selection_methods.gene_selection_scpnmf import select_genes_scpnmf
-    #    tmp_dir = os.path.join(out_dir, "tmp")
-    #    conda_env = config["venv"]
-    #    adata = os.path.join(general_params["data_path"],general_params["dataset"])  # need to delete the anndata because otherwise the h5ad file is locked and can't be read by the R script
-    #    if not os.path.exists(tmp_dir):
-    #        os.umask(0)
-    #        os.makedirs(tmp_dir, 0o777)
-    #        os.chmod(tmp_dir, 0o777)
-    #    # r_exe = "/usr/bin/Rscript"
-    #    selection, computation_time = select_genes_scpnmf(n, adata, output_path=os.path.join(tmp_dir, "scpnmf_tmp.tsv"), **kwargs, conda_env=conda_env)
-    #    adata = sc.read(adata)
+    elif method == "scpnmf":
+        from selection_methods.gene_selection_scpnmf import select_genes_scpnmf
+        if proc:
+            adata = preprocess_adata(adata)
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+        #tmp_dir = os.path.join(out_dir, "tmp")
+        #adata = os.path.join(general_params["data_path"],general_params["dataset"])  # need to delete the anndata because otherwise the h5ad file is locked and can't be read by the R script
+        #if not os.path.exists(tmp_dir):
+        #    os.umask(0)
+        #    os.makedirs(tmp_dir, 0o777)
+        #    os.chmod(tmp_dir, 0o777)
+        adata_path = os.path.join(tmp_dir, "adata_tmp.h5ad")
+        adata.write(adata_path)
+        r_exe = "Rscript" #"/usr/bin/Rscript"
+        selection, computation_time = select_genes_scpnmf(
+            n, adata_path, r_exe, output_path=os.path.join(tmp_dir, "scpnmf_tmp.tsv"), **kwargs
+        )
 
     # SCMER
     elif method == "scmer":
@@ -209,20 +214,21 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
                                                              #conda_env=conda_env,
                                                              **kwargs)
     
-    ## selfE
-    #elif method == "selfe":
-    #    from selection_methods.gene_selection_selfe import select_genes_selfe
-    #    tmp_dir = os.path.join(out_dir, "tmp")
-    #    conda_env = config["venv"]
-    #    if not os.path.exists(tmp_dir):
-    #        os.umask(0)
-    #        os.makedirs(tmp_dir, 0o777)
-    #        os.chmod(tmp_dir, 0o777)
-    #    selection, computation_time = select_genes_selfe(n=n,
-    #                                                     adata=adata,
-    #                                                     tmp_dir=tmp_dir,
-    #                                                     conda_env=conda_env,
-    #                                                     **kwargs)
+    # selfE
+    elif method == "selfe":
+        from selection_methods.gene_selection_selfe import select_genes_selfe, preprocess_adata_selfe
+        if proc:
+            adata = preprocess_adata_selfe(adata, subsample=10000)
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+        #conda_env = config["venv"]
+        #if not os.path.exists(tmp_dir):
+        #    os.umask(0)
+        #    os.makedirs(tmp_dir, 0o777)
+        #    os.chmod(tmp_dir, 0o777)
+        adata_path = os.path.join(tmp_dir, "adata_tmp.h5ad")
+        adata.write(adata_path)
+        r_exe = "Rscript" #"/usr/bin/Rscript"        
+        selection, computation_time = select_genes_selfe(n, adata_path, tmp_dir, r_exe)
 
     # COSG
     elif method == "cosg":

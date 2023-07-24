@@ -4,13 +4,16 @@ import numpy as np
 import pandas as pd
 import time
 import subprocess
+import os
 
 
 def select_genes_scpnmf(n, adata, r_exe, output_path, K=20, tol=1e-4, maxIter=1000, verboseN=True, zerotol=1e-10,
                         method="EucDist", label=None, mu=1, lam=0.01, seed=123,
                         toTest=True, cor_thres=0.7, pval_thres=0.01, return_fig=False, adj_method='BH', mc_cores=10,
                         ncol=4, toAnnotate=False, dim_use_basisSelect=None,
-                        by_basis=False, return_trunW=True, dim_use_geneSelect=None, conda_env="venv_scpnmf_R"):
+                        by_basis=False, return_trunW=True, dim_use_geneSelect=None, 
+                        #conda_env="venv_scpnmf_R"
+                        ):
     """Select genes via ScPNMF
 
         Arguments
@@ -72,16 +75,20 @@ def select_genes_scpnmf(n, adata, r_exe, output_path, K=20, tol=1e-4, maxIter=10
             comma-separated list of the bases (columns) to be used in the selected weight matrix, None value uses all bases
 
     """
+    # Get directory of this file
+    file_path = os.path.realpath(__file__)
+    dir_path = os.path.dirname(file_path)
+    r_script = dir_path + "/gene_selection_scPNMF.R"
 
     start = time.time()
-    command = r_exe + " selection_methods/gene_selection_scPNMF.R " + str(n) + " " + str(adata) + " " + str(K) + " " + str(
+    command = r_exe + " " + r_script + " " + str(n) + " " + str(adata) + " " + str(K) + " " + str(
             tol) + " " + str(maxIter) + " " + str(verboseN) + " " + str(zerotol) + " " + str(method) + " " + str(
             label) + " " + str(mu) + " " + str(lam) + " " + str(seed) + " " + \
         str(toTest) + " " + str(cor_thres) + " " + str(pval_thres) + " " + str(return_fig) + " " + str(
             adj_method) + " " + str(mc_cores) + " " + str(ncol) + " " + str(toAnnotate) + " " + str(
             dim_use_basisSelect) + " " + \
         str(by_basis) + " " + str(return_trunW) + " " + str(dim_use_geneSelect) + " " + \
-        output_path + " " + conda_env
+        output_path #+ " " + conda_env
     print(command)
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     process.wait()

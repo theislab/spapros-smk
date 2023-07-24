@@ -42,10 +42,10 @@ if(dim_use_geneSelect == "None"){
   dim_use_geneSelect <- NULL
 }
 output_path <- args[25]
-conda_env <- args[26]
+#conda_env <- args[26]
 
 # specify conda env
-use_condaenv(condaenv = conda_env, required = T)
+#use_condaenv(condaenv = conda_env, required = T)
 suppressPackageStartupMessages(library(anndata))
 
 # read input (raw counts)
