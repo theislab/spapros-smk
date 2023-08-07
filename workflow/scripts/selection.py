@@ -83,7 +83,7 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
     """
     
     if gene_key is not None:
-        adata = adata[:,gene_key]
+        adata = adata[:,adata.var[gene_key]]
         
     tmp_dir = Path(selection_csv.parent.parent , "tmp", selection_csv.stem)
     specific_dir = Path(selection_csv.parent.parent , "method_specific", selection_csv.stem)
