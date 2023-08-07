@@ -80,6 +80,11 @@ sbatch snakemake.sbatch
 snakemake --profile config/cluster/
 ```
 
+## Important notes to not introduce errors
+
+- Do not delete the files `data_parameters.csv`, `evaluation_overview.csv`, `selection_overview.csv` and `selection_parameters.csv` in case you change the config.yaml for additional runs. They will be extended automatically, otherwise the new ids in the new csvs might not match to the old ones and then incorrect datasets etc. are loaded.
+- Extending the `config.yaml` with new runs is fine. Also old runs can be deleted from the config.yaml. If they were already calculated, the old results aren't deleted. 
+- If this is confusing, you can also delete everything in the data_tmp and results folders and restart the runs. This will take longer, but you can be sure that the results are correct.
 
 
 ## Configuration file

@@ -81,7 +81,7 @@ DEFAULT_PARAMETERS_NON_PSEUDO = {
 
 class ConfigParser():
     
-    def __init__(self, config: dict) -> None:
+    def __init__(self, config: dict, save_files: bool = True) -> None:
         """
         Parse the config file and generate the final file names
         
@@ -95,6 +95,9 @@ class ConfigParser():
         
         config: dict
             Dict of config yaml
+        save_files: bool
+            Wether to save the configuration tables as csv files and create the directories. (Mainly for development 
+            purposes)
         """
         
         ## Read yaml config file
@@ -104,6 +107,12 @@ class ConfigParser():
         
         # Convert pseudo parameters to parameters
         self.config = self._convert_pseudo_params_to_param(config.copy())
+        run_evaluations = "evaluations" in self.config.keys()
+        
+        # Check that batch names of selections and evaluations don't overlap
+        if run_evaluations:
+            self._check_batch_names()
+            
         
         # Set paths
         self.DATA_DIR = self.config['DATA_DIR']
@@ -112,13 +121,15 @@ class ConfigParser():
         self.SAVE_METHOD_SPECIFIC_OUTPUT = self.config['SAVE_METHOD_SPECIFIC_OUTPUT']
         
         # Make dirs
-        Path(self.DATA_DIR_TMP).mkdir(exist_ok=True)
-        Path(self.RESULTS_DIR).mkdir(exist_ok=True)
+        if save_files:
+            Path(self.DATA_DIR_TMP).mkdir(exist_ok=True)
+            Path(self.RESULTS_DIR).mkdir(exist_ok=True)
         
         # File names of configuration tables
         self.data_params_file = Path(self.RESULTS_DIR, "data_parameters.csv")
         self.selection_params_file = Path(self.RESULTS_DIR, "selection_parameters.csv")
         self.selection_overview_file = Path(self.RESULTS_DIR, "selection_overview.csv")
+        self.evaluation_overview_file = Path(self.RESULTS_DIR, "evaluation_overview.csv")
         
         ## Reduce default hyperparameters to those that occur in the config
         ## TODO (not needed anymore with current solution): If configuration files of previous runs exist, check if there are additional hparams that were used previously
@@ -135,8 +146,28 @@ class ConfigParser():
                 main_key_param_name = "dataset",
                 param_key = "dataset_param",
                 default_param_key = "dataset",
-            )            
-            
+            )
+        if run_evaluations:
+            for eval_batch, batch_dict in self.config['evaluations'].items():
+                if batch_dict["selection_dataset"]: 
+                    # Add additional datasets from selections if `selection_dataset` == True in config.yaml 
+                    # (however, we use the eval dataset_params, otherwise the data config would be given by the 
+                    # selection batch already)
+                    selection_datasets = [d for s_batch in batch_dict["batches"] for d in self.config['selections'][s_batch]["datasets"]]
+                    eval_datasets = batch_dict["datasets"]
+                    batch_dict["datasets"] = list(set(eval_datasets + selection_datasets))
+
+                dataset_param_combs[eval_batch] = self._get_combinations_of_params(
+                    batch_dict, default_hparams,
+                    main_key = "datasets",
+                    main_key_param_name = "dataset",
+                    param_key = "dataset_param",
+                    default_param_key = "dataset",
+                )
+                # Set back to original datasets and save the selection specific datasets
+                if batch_dict["selection_dataset"]:
+                    batch_dict["datasets"] = eval_datasets
+        
         # Selection configurations
         selection_param_combs = {}
         for batch, batch_dict in self.config['selections'].items():
@@ -160,6 +191,10 @@ class ConfigParser():
         selection_ids_to_config, selection_param_combs = self._get_ids_and_configs(
             selection_param_combs, id_str="selection_id", ids_to_config_old=selection_ids_to_config_old
         )
+        # Map evaluation batch to dataset ids 
+        # (+ save info if the dataset is listed to only be used to evaluate selections selected on the same dataset)
+        if run_evaluations:
+            self.eval_batch_to_data_ids = self._get_eval_batch_to_data_ids(dataset_param_combs)
         
         self.dfs = {}
         
@@ -176,25 +211,51 @@ class ConfigParser():
         self.dfs["selection"] = df_selection.set_index("selection_id")
         
         # Table of all selections defined in each batch
-        key_order = ["batch", "method", "dataset", "selection_id", "data_id", "file_names"]
+        key_order = ["batch", "method", "dataset", "selection_id", "data_id", "file_names", "selection_name"]
         df = pd.DataFrame(self._get_combined_configurations(dataset_param_combs, selection_param_combs))
-        df["file_names"] = df.apply(
-            lambda x: f"selection/{x['method']}_{x['selection_id']}_{x['dataset']}_{x['data_id']}.csv", axis=1
-        )
+        df["selection_name"] = df["method"] + "_" + df["selection_id"].astype(str) + "_" + df["dataset"] + "_" + df["data_id"].astype(str)
+        df["file_names"] = "selection/" + df["selection_name"] + ".csv"
         for key in key_order[::-1]:
             df.insert(0, key, df.pop(key))
         df = df.astype("object")
         self.dfs["selection_overview"] = df
         
+        # Table of all evaluations defined in each batch
+        if run_evaluations:
+            self.dfs["evaluation_overview"] = self._get_evaluations_overview()
+        
         # Save tables
-        self.dfs["data"].to_csv(self.data_params_file)
-        self.dfs["selection"].to_csv(self.selection_params_file)
-        self.dfs["selection_overview"].to_csv(self.selection_overview_file)
+        if save_files:
+            self.dfs["data"].to_csv(self.data_params_file)
+            self.dfs["selection"].to_csv(self.selection_params_file)
+            self.dfs["selection_overview"].to_csv(self.selection_overview_file)
+            if run_evaluations:
+                self.dfs["evaluation_overview"].to_csv(self.evaluation_overview_file)
+        
+        # Get file name lists
+        self.file_names = {}
+        self.file_names["selection"] = self.dfs["selection_overview"]["file_names"].unique().tolist()
+        self.file_names["evaluated_selection"] = self.dfs["selection_overview"].loc[
+            self.dfs["selection_overview"]["selection_name"].isin(self.dfs["evaluation_overview"]["selection_name"].unique()),
+            "file_names"
+        ].tolist()
+        self.file_names["non_evaluated_selection"] = [f for f in self.file_names["selection"] if f not in self.file_names["evaluated_selection"]]
+        self.file_names["evaluation_summary"] = self.dfs["evaluation_overview"]["eval_summary_file"].unique().tolist()
         
         # Get all pipeline output file names
-        self.file_names = self.dfs["selection_overview"]["file_names"].unique().tolist()
-        #self.file_names = [str(Path(self.RESULTS_DIR, file_name)) for file_name in file_names]
+        self.file_names["pipeline_output"] = self.file_names["evaluation_summary"] + self.file_names["non_evaluated_selection"]
         
+   
+    def get_evaluation_files_to_summarise(self, eval_dataset: str, eval_data_id: int) -> List[str]: 
+        """Get the evaluation files to compute summary metrics for a given evaluation dataset
+        """
+        df = self.dfs["evaluation_overview"]
+
+        eval_files = df.loc[
+            (df["eval_dataset"] == eval_dataset) & (df["eval_data_id"] == int(eval_data_id)), "eval_file_name"
+        ].unique().tolist()
+        
+        return eval_files
    
     def get_selection_params(self, selection_id: int) -> dict:
         """Get the selection parameters for a given selection id
@@ -541,12 +602,76 @@ class ConfigParser():
         
         return config_dict
         
+        
+    def _get_eval_batch_to_data_ids(self, dataset_param_combs: dict) -> dict:
+        """Get a dictionary with evaluation batches as keys and a list of data ids as values
+        
+        Arguments
+        ---------
+        dataset_param_combs: dict
+            Dictionary with batch names as keys and a list of dictionaries with all combinations of parameters as 
+            values.
+            e.g.: {
+                "batch1" : [
+                    {'dataset': 'sc_mouse_brain', 'n_cts': None, 'cells_per_ct': None, 'id': 0},
+                    {'dataset': 'sc_mouse_brain', 'n_cts': None, 'cells_per_ct': 50, 'id': 1},
+                ],
+                "batch2" : [
+                    {'dataset': 'sc_mouse_brain', 'n_cts': None, 'cells_per_ct': None, 'id': 0}
+                ]
+            }
+            
+        Returns
+        -------
+        eval_batch_to_data_ids: dict
+            Dictionary with evaluation batches as keys and a list of data ids as values
+            e.g.: {
+                "batch1" : {
+                    "all_selections" : [0, 1],
+                    "selection_specific" : [1]
+                },
+                "batch2" : {
+                    "all_selections" : [0],
+                    "selection_specific" : []
+                }
+            }
+        """
+        evaluation_batches = list(self.config["evaluations"].keys())
+        
+        eval_batch_to_data_ids = {}
+        
+        for batch in evaluation_batches:
+            
+            eval_batch_to_data_ids[batch] = {"all_selections":{}, "selection_specific":{}}
+            
+            dataset_ids_all = []
+            dataset_ids_specific = []
+            
+            for dataset_config in dataset_param_combs[batch]:
+                if dataset_config["dataset"] in self.config["evaluations"][batch]["datasets"]:
+                    dataset_ids_all.append(dataset_config["data_id"])
+                else:
+                    dataset_ids_specific.append(dataset_config["data_id"])
+                    
+            eval_batch_to_data_ids[batch]["all_selections"] = dataset_ids_all
+            eval_batch_to_data_ids[batch]["selection_specific"] = dataset_ids_specific
+                
+        return eval_batch_to_data_ids
+
+        
+        
+        
     def _get_combined_configurations(self, dataset_param_combs: dict, selection_param_combs: dict) -> List[dict]:
         """Get all combinations of dataset and selection configurations within each batch
         """
         
         combined_configs = {}
         for batch in dataset_param_combs.keys():
+            
+            # Skip evaluation batches 
+            if batch not in selection_param_combs.keys():
+                continue
+            
             dataset_configs = dataset_param_combs[batch]
             selection_configs = selection_param_combs[batch]
             
@@ -562,132 +687,111 @@ class ConfigParser():
         return combined_configs
         
         
+    def _check_batch_names(self) -> None:
+        """Check correct setting of batch names
+        """
+        selection_batches = list(self.config["selections"].keys())
+        evaluation_batches = list(self.config["evaluations"].keys())
+        
+        # Check that batch names of selections and evaluations don't overlap
+        if len(set(selection_batches).intersection(set(evaluation_batches))) > 0:
+            raise ValueError("Batch names of selections and evaluations can not overlap")
+            
+        selection_batches_from_eval = []
+        for batch in evaluation_batches:
+            selection_batches_from_eval += self.config["evaluations"][batch]["batches"]
+            
+        # Check that all selection_batches_from_eval occur in selection_batches
+        batches_in_eval_not_selection = set(selection_batches_from_eval).difference(set(selection_batches))
+        if len(batches_in_eval_not_selection) > 0:
+            raise ValueError(f"Batches {batches_in_eval_not_selection} from evaluations do not occur in selections")
         
         
+    def _get_evaluations_overview(self) -> pd.DataFrame:
+        """Get overview table of all evaluations defined in each batch
+        """
         
+        key_order = [
+            "eval_batch", "eval_dataset", "eval_data_id", "metric", "eval_file_name", "eval_summary_file", 
+            "selection_batch", "selection_name", "selection_method", "selection_id", "selection_dataset", 
+            "selection_data_id"
+        ]
         
+        evals = []
         
+        for eval_batch, batch_dict in self.config['evaluations'].items():
+
+            metrics = batch_dict["metrics"]
+            selection_batches = batch_dict["batches"]
+            
+            selections = self.dfs["selection_overview"].loc[self.dfs["selection_overview"]["batch"].isin(selection_batches)]
+            rename_columns = {
+                "batch":"selection_batch", "method":"selection_method", "dataset":"selection_dataset", 
+                "selection_id":"selection_id", "data_id":"selection_data_id"
+            }
+            selections = selections[list(rename_columns.keys())].rename(columns=rename_columns)
+            
+            df_list = []
+            
+            # First add evaluations for the datasets applied to all selections
+            
+            # Duplicate each line for each metric and for each eval_dataset
+            dataset_ids = self.eval_batch_to_data_ids[eval_batch]["all_selections"]
+            
+            df1 = pd.DataFrame(
+                data = list(itertools.product(metrics, dataset_ids)), 
+                columns = ["metric", "eval_data_id"]
+            )
+            df2 = selections.copy()
+            rows = []
+            for i in df1.index:
+                row1 = df1.loc[i].tolist()
+                for j in df2.index:
+                    rows.append(row1 + df2.loc[j].tolist())
+            df = pd.DataFrame(columns=df1.columns.tolist() + df2.columns.tolist(), data=rows)
+            df_list.append(df)
+            
+            # Secondly, add evaluations for the selection specific datasets
+            dataset_ids = self.eval_batch_to_data_ids[eval_batch]["selection_specific"]
+            datasets = [self.dfs["data"].loc[data_id, "dataset"] for data_id in dataset_ids]
+            
+            for dataset, dataset_id in zip(datasets, dataset_ids):
+                df1 = pd.DataFrame(
+                    data = list(itertools.product(metrics, [dataset_id])), 
+                    columns = ["metric", "eval_data_id"]
+                )
+                df2 = selections.loc[selections["selection_dataset"] == dataset].copy()
+                rows = []
+                for i in df1.index:
+                    row1 = df1.loc[i].tolist()
+                    for j in df2.index:
+                        rows.append(row1 + df2.loc[j].tolist())
+                df = pd.DataFrame(columns=df1.columns.tolist() + df2.columns.tolist(), data=rows)
+                df_list.append(df)
+
+            # Concatenate all dataframes
+            df = pd.concat(df_list)
+            
+            df["eval_batch"] = eval_batch
+            df["eval_dataset"] = df.apply(lambda x: self.dfs["data"].loc[x["eval_data_id"], "dataset"], axis=1)
+            
+            df["selection_name"] = df.apply(
+                lambda x: f"{x['selection_method']}_{x['selection_id']}_{x['selection_dataset']}_{x['selection_data_id']}", axis=1
+            )
+            
+            df["eval_file_name"] = df.apply(
+                lambda x: f"evaluation/{x['metric']}/{x['metric']}_{x['eval_dataset']}_{x['eval_data_id']}_{x['selection_name']}.csv", axis=1
+            )
+            df['eval_summary_file'] = df.apply(
+                lambda x: f"evaluation/{x['eval_dataset']}_{x['eval_data_id']}_summary.csv", axis=1
+            )
+
+            evals.append(df)
+            
+        df = pd.concat(evals)
+        df = df.astype("object")
+        df = df[key_order]
+                
+        return df
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    #def _get_combinations_of_dataset_params(self, batch_dict: dict, default_hparams: dict) -> List[dict]:
-    #    """Convert dataset config into list of dictionaries with all combinations of dataset parameters
-    #    
-    #    example how the config looks like:
-    #    batch2:
-    #        ...
-    #        datasets: [sc_mouse_brain, sc_human_brain]
-    #        dataset_param:
-    #            cells_per_ct: [50,100,200,500,1000,None]
-    #            gene_key: ["hvg_probe_constraint"]
-    #    
-    #    Arguments
-    #    ---------   
-    #    --> batch_dict = {  
-    #            "datasets"      : ["sc_mouse_brain", "sc_human_brain"],
-    #            "dataset_param" : {
-    #                "cells_per_ct": [50,100,200,500,1000,None],
-    #                "gene_key": ["hvg_probe_constraint"]
-    #            }
-    #        }
-    #    
-    #    Returns
-    #    -------
-    #    --> param_dicts = [
-    #            {'datasets': 'sc_mouse_brain', 'cells_per_ct': 50, 'gene_key': 'hvg_probe_constraint'},
-    #            {'datasets': 'sc_mouse_brain', 'cells_per_ct': 100,'gene_key': 'hvg_probe_constraint'},
-    #            ...
-    #        ]
-    #    """
-    #    
-    #    if "dataset_param" not in batch_dict.keys():
-    #        param_dicts = [{"dataset":dataset} for dataset in batch_dict['datasets']]
-    #    else:
-    #        # Get all possible combinations of dataset parameters as list of dictionaries
-    #        val_combs = list(itertools.product(*batch_dict['dataset_param'].values()))
-    #        param_dicts = [{key:val for key, val in zip(batch_dict['dataset_param'].keys(), vals)} for vals in val_combs]
-    #        
-    #        # Repeat combinations for each of the datasets and add the dataset name
-    #        param_dicts = [
-    #            {"dataset":dataset, **p_dict} for dataset, p_dict in list(itertools.product(batch_dict['datasets'], param_dicts))
-    #        ]
-    #        
-    #    # Add default hyperparameters that are not specified in the config
-    #    for param_dict in param_dicts:
-    #        for key, val in default_hparams["dataset"].items():
-    #            if key not in param_dict.keys():
-    #                param_dict[key] = val
-    #                
-    #    # Order each dictionary by the order of ["dataset"] + default_hparams["dataset"].keys()
-    #    param_dicts = [
-    #        {key: param_dict[key] for key in ["dataset"] + list(default_hparams["dataset"].keys())} for param_dict in param_dicts
-    #    ]
-    #    
-    #    
-    #    return param_dicts
-    #
-    #def _get_combinations_of_selection_params(self, batch_dict: dict, default_hparams: dict) -> List[dict]:
-    #    """Convert selection config into list of dictionaries with all combinations of selection parameters
-    #    
-    #    example how the config looks like:
-    #    batch2:
-    #        ...
-    #        selection_param:
-    #            n: [50,100,150]
-    #            penalty : [None, "highly_expressed_penalty"]
-    #        methods:
-    #            spapros
-    #            nsforest
-    #            
-    #    Arguments
-    #    ---------
-    #    --> batch_dict = {
-    #            "selection_param" : {
-    #                "n": [50,100,150],
-    #                "penalty" : [None, "highly_expressed_penalty"]
-    #            },
-    #            "methods": ["spapros", "nsforest"]
-    #        }
-    #    
-    #    Returns
-    #    -------
-    #    --> param_dicts = [
-    #            {'method': 'spapros', 'n': 50, 'penalty': None},
-    #            {'method': 'spapros', 'n': 50, 'penalty': 'highly_expressed_penalty'},
-    #            ...
-    #        ]
-    #        
-    #    """
-    #    
-    #    if "selection_param" not in batch_dict.keys():
-    #        param_dicts = [{"method":method} for method in batch_dict['methods']]
-    #    else:
-    #        # Get all possible combinations of selection parameters as list of dictionaries
-    #        val_combs = list(itertools.product(*batch_dict['selection_param'].values()))
-    #        param_dicts = [{key:val for key, val in zip(batch_dict['selection_param'].keys(), vals)} for vals in val_combs]
-    #        
-    #        # Repeat combinations for each of the methods and add the method name
-    #        param_dicts = [
-    #            {"method":method, **p_dict} for method, p_dict in list(itertools.product(batch_dict['methods'], param_dicts))
-    #        ]
-    #        
-    #    # Add default hyperparameters that are not specified in the config
-    #    for param_dict in param_dicts:
-    #        for key, val in default_hparams["selection"].items():
-    #            if key not in param_dict.keys():
-    #                param_dict[key] = val
-    #    
-    #    # Order each dictionary by the order of ["method"] + default_hparams["selection"].keys()
-    #    param_dicts = [
-    #        {key: param_dict[key] for key in ["method"] + list(default_hparams["selection"].keys())} for param_dict in param_dicts
-    #    ]
-    #    
-    #    return param_dicts
+

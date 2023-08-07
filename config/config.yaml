@@ -16,18 +16,32 @@ selections:
     #dataset_param:
     #  cells_per_ct_n_seeds : [4]
     selection_param:
-      n: [5] #[75]  #,100,150]
+      n: [25] #[5] #[75]  #,100,150]
       method_specific_processing: [True] #[True, False]
+      "gene_key": ["highly_variable"]
     methods:
-      spapros
-      #DE
-      #pca
+      DE
+      pca
+      #spapros
       #scgenefit
       #nsforest
       #scmer
       #smash
       #asfs
       #cosg
+  batch_test2:
+    datasets: [adata_test]
+    dataset_param:
+      cells_per_ct_n_seeds : [1]
+      cells_per_ct : [50]
+    selection_param:
+      n: [25] #[5] #[75]  #,100,150]
+      method_specific_processing: [True] #[True, False]    
+      "gene_key": ["highly_variable"]  
+    methods:
+      DE
+      pca      
+      #spapros
 #  batch1:
 #    datasets: [sc_mouse_brain]
 #    selection_param:
@@ -78,3 +92,48 @@ selections:
 #      spapros
     #param_link: 
     #  dataset_param-cells_per_ct: methods-spapros-
+
+evaluations:
+  eval_batch1:
+    batches: [batch_test]
+    selection_dataset: False
+    datasets: [adata_test]
+    dataset_param:
+      processing: [lognorm]
+    metrics: [cluster_similarity] #,  knn_overlap,  forest_clfs, gene_corr]
+  eval_batch1.2:
+    batches: [batch_test2]
+    selection_dataset: False
+    datasets: [adata_test]
+    dataset_param:
+      processing: [lognorm]    
+    metrics: [forest_clfs]
+  eval_batch1.3:
+    batches: [batch_test2]
+    selection_dataset: True
+    datasets: [adata_testest]
+    dataset_param:
+      processing: [lognorm]
+    metrics: [forest_clfs, knn_overlap, gene_corr]    
+  #eval_batch1:
+  #  batches: [batch1]
+  #  selection_dataset: False
+  #  datasets: [sn_human_brain, merfish_human_brain]
+  #  dataset_param:
+  #    processing: [lognorm]
+  #  metrics: [cluster_similarity,  knn_overlap,  forest_clf]
+  #eval_batch1.2:
+  #  batches: [batch1.2]
+  #  selection_dataset: False
+  #  datasets: [merfish_human_brain]
+  #  dataset_param:
+  #    processing: [lognorm]    
+  #  metrics: [forest_clf]
+  #eval_batch2:
+  #  batches: [batch2, batch2.2]
+  #  selection_dataset: True
+  #  datasets: []
+  #  dataset_param:
+  #    processing: [lognorm]    
+  #  metrics: [cluster_similarity,  knn_overlap,  forest_clf]
+      

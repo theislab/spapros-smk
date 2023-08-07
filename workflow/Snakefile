@@ -4,15 +4,19 @@ from ConfigParser import ConfigParser
 configfile: './config/config.yaml'
 
 parser = ConfigParser(config)
-final_files = parser.file_names
+final_files = parser.file_names["pipeline_output"] 
 
 
 # Ensures dataset and method are names not file paths, and ids are ints
 wildcard_constraints:
     dataset="[^\/]+",
+    eval_dataset="[^\/]+",
     method="[^\/]+",
+    metric="[^\/]+",
     data_id="\d+",
+    eval_data_id="\d+",
     selection_id="\d+"
+    
 
 
 rule all:
@@ -320,3 +324,129 @@ rule selection_scpnmf:
         "-id {wildcards.selection_id} "
         "-f {params.selection_params_file} "
         "-s {params.save_method_specific_output}"
+        
+        
+# ----------------------------------------------------------
+# Evaluation
+# ----------------------------------------------------------
+
+rule eval0_shared:
+    input:
+        data_path = expand("{data_dir}/{{eval_dataset}}_{{eval_data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output: 
+        expand("{results_dir}/evaluation/references/{{eval_dataset}}_{{eval_data_id}}_{{metric}}.csv", results_dir=config['RESULTS_DIR'])
+    resources: mmem_mb=20000
+    conda:
+        "envs/venv_spapros.yaml"    
+    params:
+        data_path = config['DATA_DIR_TMP'] + "/{eval_dataset}_{eval_data_id}.h5ad",
+        results_dir = config['RESULTS_DIR'],
+        dataset_params_file = parser.data_params_file
+    shell:
+        "python workflow/scripts/evaluation.py "
+        "--eval_step shared "
+        "--metric {wildcards.metric} "
+        "--data {input.data_path} "
+        "--results_dir {params.results_dir} "
+        "--dataset_params_file {params.dataset_params_file} "
+
+rule eval1_pre:
+    input: 
+        expand("{results_dir}/selection/{{method}}_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR']),
+        data_path = expand("{data_dir}/{{eval_dataset}}_{{eval_data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output: 
+        expand("{results_dir}/evaluation/{{metric}}/{{metric}}_{{eval_dataset}}_{{eval_data_id}}_{{method}}_{{selection_id}}_{{dataset}}_{{data_id}}_pre.csv", results_dir=config['RESULTS_DIR'])
+    resources: mmem_mb=60000
+    conda:
+        "envs/venv_spapros.yaml"    
+    params:
+        results_dir = config['RESULTS_DIR'],
+        selection_name = "{method}_{selection_id}_{dataset}_{data_id}",
+        evaluation_overview_file = parser.evaluation_overview_file,
+        dataset_params_file = parser.data_params_file
+    shell:
+        "python workflow/scripts/evaluation.py "
+        "--eval_step pre "
+        "--metric {wildcards.metric} " # not needed for summary
+        "--data {input.data_path} "
+        "--results_dir {params.results_dir} "
+        "--selection {params.selection_name} "
+        "--dataset_params_file {params.dataset_params_file} "
+
+
+def get_eval_main_inputs(wildcards, results_dir=config['RESULTS_DIR'], data_dir=config['DATA_DIR_TMP']):
+    """List up input files for the main evaluation step rule for a given metric
+    
+    Some metrics don't have "shared" or "pre" results, therefore we need to create a filtered list of input files.
+    """
+    data_path = f"{data_dir}/{wildcards.eval_dataset}_{wildcards.eval_data_id}.h5ad"
+    eval_dataset = f"{wildcards.eval_dataset}_{wildcards.eval_data_id}"
+    selection = f"{wildcards.method}_{wildcards.selection_id}_{wildcards.dataset}_{wildcards.data_id}"
+
+    probe_set_file = f"{results_dir}/selection/{selection}.csv"
+    shared = f"{results_dir}/evaluation/references/{eval_dataset}_{wildcards.metric}.csv"
+    pre_file_name = f"{results_dir}/evaluation/{wildcards.metric}/{wildcards.metric}_{eval_dataset}_{selection}_pre.csv"
+    
+    # Some metrics don't have "shared" or "pre" results, add them conditionally
+    input_files = {
+        "data_path": data_path, 
+        "probe_set_file" : probe_set_file
+    }
+    if wildcards.metric != "forest_clfs":
+        input_files["shared"] = shared
+    if wildcards.metric not in ["forest_clfs", "marker_corr", "gene_corr"]:
+        input_files["pre"] = pre_file_name
+    
+    return input_files
+
+rule eval2_main:
+    input: 
+        unpack(get_eval_main_inputs)
+    output:
+        expand("{results_dir}/evaluation/{{metric}}/{{metric}}_{{eval_dataset}}_{{eval_data_id}}_{{method}}_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    resources: mmem_mb=20000
+    conda:
+        "envs/venv_spapros.yaml"    
+    params:
+        results_dir = config['RESULTS_DIR'],
+        selection_name = "{method}_{selection_id}_{dataset}_{data_id}",
+        evaluation_overview_file = parser.evaluation_overview_file,
+        dataset_params_file = parser.data_params_file
+    shell:
+        "python workflow/scripts/evaluation.py "
+        "--eval_step main "
+        "--metric {wildcards.metric} "
+        "--data {input.data_path} "
+        "--results_dir {params.results_dir} "
+        "--selection {params.selection_name} "
+        "--dataset_params_file {params.dataset_params_file} "     
+
+
+def get_evaluation_files_to_summarise(wildcards, results_dir=config['RESULTS_DIR']):
+    """List up all evaluation files that are summarised in one table (i.e. all evaluations of a given evaluation dataset)
+    """
+    files = parser.get_evaluation_files_to_summarise(wildcards.eval_dataset, wildcards.eval_data_id)
+    return [f"{results_dir}/{f}" for f in files]
+
+rule eval3_summary:
+    input:
+        get_evaluation_files_to_summarise,
+        data_path = expand("{data_dir}/{{eval_dataset}}_{{eval_data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output: 
+        expand("{results_dir}/evaluation/{{eval_dataset}}_{{eval_data_id}}_summary.csv", results_dir=config['RESULTS_DIR'])
+        #expand("{results_dir}/evaluation/{{eval_dataset}}_{{eval_data_id}}_summary_{timestamp}.csv", results_dir=config['RESULTS_DIR'], timestamp=timestamp)
+    resources: mmem_mb=60000
+    conda:
+        "envs/venv_spapros.yaml"    
+    params:
+        results_dir = config['RESULTS_DIR'],
+        evaluation_overview_file = parser.evaluation_overview_file,
+        dataset_params_file = parser.data_params_file
+    shell:
+        "python workflow/scripts/evaluation.py "
+        "--eval_step summary "
+        "--data {input.data_path} "
+        "--results_dir {params.results_dir} "
+        "--evaluation_overview_file {params.evaluation_overview_file} " 
+        "--dataset_params_file {params.dataset_params_file} "     
+
