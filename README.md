@@ -64,6 +64,9 @@ In the `spapros-smk` directory create a file, e.g. `snakemake.sbatch` with the f
 
 conda activate spapros_smk
 
+export SINGULARITY_TMPDIR=<some/tmp/dir/that/exists/and/has/space>
+export APPTAINER_TMPDIR=<some/tmp/dir/that/exists/and/has/space>
+
 snakemake --profile config/cluster/
 
 ```
