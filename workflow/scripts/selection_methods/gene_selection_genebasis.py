@@ -53,8 +53,10 @@ def select_genes_genebasis(n, adata, tmp_dir, #conda_env,
     adata.write_h5ad(preprocessed_adata_path)
     del adata  # need to delete the anndata because otherwise the h5ad file is locked and can't be read by the R script
 
+    select_scripts_dir = os.path.dirname(os.path.abspath(__file__))
+
     start = time.time()
-    command = r_exe + " selection_methods/gene_selection_geneBasis.R " + " ".join([str(n),  # 1
+    command = r_exe + f" {select_scripts_dir}/gene_selection_geneBasis.R " + " ".join([str(n),  # 1
                                                                                    preprocessed_adata_path,  # 2
                                                                                    os.path.join(tmp_dir, "genebasis_tmp.tsv"),  # 3
                                                                                    str(" ".join(genes_base)) if genes_base is not None else str(None),  # 4

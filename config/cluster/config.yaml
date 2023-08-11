@@ -1,6 +1,7 @@
 cluster: 
   sbatch
       --partition={resources.partition}
+      --qos={resources.qos}
       --cpus-per-task={threads}
       --job-name=smk_{rule}
       --output=logs/{rule}_output_%j.txt
@@ -10,6 +11,7 @@ cluster:
       --time=12:00:00
 default-resources:
       - partition=cpu_p
+      - qos=cpu_normal
       - mem_mb=32000
 use-conda: True
 use-singularity: True

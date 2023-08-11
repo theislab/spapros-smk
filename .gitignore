@@ -1,6 +1,7 @@
 # additional
 .snakemake/
 .DS_Store
+.conda
 logs/
 results/
 */dev_*.ipynb
