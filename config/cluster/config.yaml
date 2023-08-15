@@ -8,11 +8,12 @@ cluster:
       --error=logs/{rule}_output_%j.txt
       --mem={resources.mem_mb}
       --nice=10000
-      --time=12:00:00
+      --time=24:00:00
 default-resources:
       - partition=cpu_p
       - qos=cpu_normal
-      - mem_mb=32000
+      - mem_mb=64000
+max-threads: 12
 use-conda: True
 use-singularity: True
 singularity-args:

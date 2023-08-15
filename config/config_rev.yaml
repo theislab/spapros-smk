@@ -1,0 +1,83 @@
+
+# when using relative paths: note that the working directory is the pwd of the terminal from where snakemake is run, 
+# this should be .../spapros-smk  (also possible: .../spapros-smk/workflow, might mess things up though)
+DATA_DIR: /lustre/groups/ml01/workspace/louis.kuemmerle/projects/G1/data/processed_rev
+DATA_DIR_TMP: /lustre/groups/ml01/workspace/louis.kuemmerle/projects/G1/data/processed_rev/tmp_data
+RESULTS_DIR: /lustre/groups/ml01/workspace/louis.kuemmerle/projects/G1/results/spapros_smk_res
+SAVE_METHOD_SPECIFIC_OUTPUT: True # Whether to save method specific output of the selection methods (will be in RESULTS_DIR+"method_specific/{run}/")
+
+
+selections:
+  batch1:
+    datasets: [2019Hodge_sn_human_brain_MTG_min20perct] 
+    selection_param:
+      n: [50,75,100,150]
+    methods:
+      spapros
+      nsforest
+      scmer
+      DE
+#  batch1.2:
+#    datasets: [2019Hodge_sn_human_brain_MTG_min20perct]
+#    dataset_param:
+#      cells_per_ct: [50,100,200,500,1000,None]
+#    selection_param:
+#      n: [50,150]
+#    methods:
+#      spapros
+#  batch2:
+#    datasets: [Madissoon2019, Litvinukova2020]
+#    selection_param:
+#      n: [50,150]
+#    methods:
+#      geneBasis
+#  batch2.2:
+#    datasets: [Madissoon2019, Litvinukova2020]
+#    selection_param:
+#      n: [50,150]
+#      gene_key: ["hvg_probe_constraint"]
+#    methods:
+#      spapros
+#  batch3:
+#    datasets: [2211_HLCA_subset_raw]
+#    selection_param:
+#      n: [50,150]
+#      ct_key: ["annotation_level1","annotation_level2","annotation_level3","annotation_level4","annotation_level5"]
+#               transf_ann_level_1_label, transf_ann_level_2_label, transf_ann_level_3_label, transf_ann_level_4_label, transf_ann_level_5_label
+#    methods:
+#      spapros
+#  batch4:
+#    datasets: [Madissoon2019, Meyer5loc2021, Litvinukova2020, 2019Hodge_sn_human_brain_MTG_min20perct]
+#    dataset_param:
+#      n_cts : [...]
+#      cells_per_ct : [...]
+#      cells_per_ct_n_seeds : [10]
+#    selection_param:
+#      n: [50,150]
+#    methods:
+#      spapros
+#
+#
+#evaluations:
+#  eval_batch1:
+#    batches: [batch1]
+#    selection_dataset: False
+#    datasets: [2019Hodge_sn_human_brain_MTG_min20perct, merfish_human_brain]
+#    dataset_param:
+#      processing: [lognorm]
+#    metrics: [cluster_similarity,  knn_overlap,  forest_clf]
+#  eval_batch1.2:
+#    batches: [batch1.2]
+#    selection_dataset: False
+#    datasets: [merfish_human_brain]
+#    dataset_param:
+#      processing: [lognorm]    
+#    metrics: [forest_clf]
+#  eval_batch2:
+#    batches: [batch2, batch2.2]
+#    selection_dataset: True
+#    datasets: []
+#    dataset_param:
+#      processing: [lognorm]    
+#    metrics: [cluster_similarity,  knn_overlap,  forest_clf]
+      
