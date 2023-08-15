@@ -223,6 +223,13 @@ class ConfigParser():
         # Table of all evaluations defined in each batch
         if run_evaluations:
             self.dfs["evaluation_overview"] = self._get_evaluations_overview()
+        else:
+            self.dfs["evaluation_overview"] = pd.DataFrame(
+                columns=[
+                    "eval_batch","eval_dataset","eval_data_id","metric","eval_file_name","eval_summary_file",
+                    "selection_batch","selection_name","selection_method","selection_id","selection_dataset",
+                    "selection_data_id"]
+            )
         
         # Save tables
         if save_files:
