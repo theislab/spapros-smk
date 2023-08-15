@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import scanpy as sc
-from scipy.sparse import issparse
+from scipy.sparse import issparse, csr_matrix
 from sklearn.utils import sparsefuncs
 
 
@@ -45,6 +45,7 @@ def get_highly_variable(adata,N=8000,key_added='highly_variable'):
     """
     a = adata.copy()
     a.X /= a.obs['size_factors'].values[:,None]
+    a.X = csr_matrix(a.X)
     sc.pp.log1p(a)
     sc.pp.highly_variable_genes(a, n_top_genes=N, flavor='cell_ranger', inplace=True)
     adata.var[key_added] = a.var['highly_variable']
