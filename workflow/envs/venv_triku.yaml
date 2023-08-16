@@ -7,7 +7,6 @@ dependencies:
   - anndata==0.8.0
   - cython==0.29.24
   - networkx==2.3
-  - numba==0.54.0
   - numexpr==2.7.3
   - numpy==1.17.0
   - numpy-base==1.17.0
