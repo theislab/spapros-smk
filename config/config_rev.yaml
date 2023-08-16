@@ -30,7 +30,7 @@ selections:
     selection_param:
       n: [50,150]
     methods:
-      geneBasis
+      genebasis
   batch2.3:
     datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
     selection_param:

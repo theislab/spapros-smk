@@ -77,6 +77,7 @@ DEFAULT_PARAMETERS_NON_PSEUDO = {
     "selection": {k: v for k,v in DEFAULT_PARAMETERS["selection"].items() if k not in PSEUDO_PARAM_TO_PARAM["selection"]},
 }
 
+#TODO: Add list of supported selection methods and assert that given methods are in the list
 
 
 class ConfigParser():
