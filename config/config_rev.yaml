@@ -124,4 +124,11 @@ evaluations:
 #    dataset_param:
 #      processing: [lognorm]    
 #    metrics: [cluster_similarity,  knn_overlap,  forest_clfs]
+#  eval_batch2.2:
+#    batches: [batch5]
+#    selection_dataset: True
+#    datasets: []
+#    dataset_param:
+#      processing: [lognorm]    
+#    metrics: [cluster_similarity,  knn_overlap,  forest_clfs]
       

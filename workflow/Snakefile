@@ -59,6 +59,8 @@ rule selection_spapros:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/spapros_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/spapros_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_spapros.yaml"
     log:
@@ -81,6 +83,8 @@ rule selection_DE:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/DE_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/DE_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_spapros.yaml"
     log:
@@ -102,6 +106,8 @@ rule selection_pca:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/pca_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/pca_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_spapros.yaml"
     threads: 12        
@@ -124,6 +130,8 @@ rule selection_scgenefit: # spapros, asfs, cosg, nsforest, scmer, triku, smash
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/scgenefit_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/scgenefit_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_scgenefit.yaml"
     threads: 12        
@@ -148,6 +156,8 @@ rule selection_nsforest:
         expand("{results_dir}/selection/nsforest_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
     conda:
         "envs/venv_selection.yaml"
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/nsforest_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     threads: 12        
     log:
         "logs/selections/nsforest_{selection_id}_{dataset}_{data_id}.csv"
@@ -168,6 +178,8 @@ rule selection_scmer: # spapros, asfs, cosg, nsforest, scmer, triku, smash
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/scmer_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/scmer_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_selection.yaml"
     threads: 12        
@@ -190,6 +202,8 @@ rule selection_smash:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/smash_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/smash_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_smash.yaml"
     threads: 12        
@@ -212,6 +226,8 @@ rule selection_asfs:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/asfs_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/asfs_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_asfs.yaml"
     threads: 12        
@@ -234,6 +250,8 @@ rule selection_cosg:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/cosg_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/cosg_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_cosg.yaml"
     threads: 12        
@@ -256,6 +274,8 @@ rule selection_triku:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/triku_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/triku_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_triku.yaml"
     threads: 12        
@@ -280,6 +300,8 @@ rule selection_selfe:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/selfe_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/selfe_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     threads: 12        
     log:
         "logs/selections/selfe_{selection_id}_{dataset}_{data_id}.csv"
@@ -302,6 +324,8 @@ rule selection_genebasis:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/genebasis_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/genebasis_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     threads: 12        
     log:
         "logs/selections/genebasis_{selection_id}_{dataset}_{data_id}.csv"
@@ -324,6 +348,8 @@ rule selection_scpnmf:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output:
         expand("{results_dir}/selection/scpnmf_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/scpnmf_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     threads: 12        
     log:
         "logs/selections/scpnmf_{selection_id}_{dataset}_{data_id}.csv"
@@ -349,6 +375,8 @@ rule eval0_shared:
         data_path = expand("{data_dir}/{{eval_dataset}}_{{eval_data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output: 
         expand("{results_dir}/evaluation/references/{{eval_dataset}}_{{eval_data_id}}_{{metric}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/evaluation/eval0_{{eval_dataset}}_{{eval_data_id}}_{{metric}}.benchmark.txt"
     threads: 12    
     conda:
         "envs/venv_spapros.yaml"    
@@ -370,6 +398,8 @@ rule eval1_pre:
         data_path = expand("{data_dir}/{{eval_dataset}}_{{eval_data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output: 
         expand("{results_dir}/evaluation/{{metric}}/{{metric}}_{{eval_dataset}}_{{eval_data_id}}_{{method}}_{{selection_id}}_{{dataset}}_{{data_id}}_pre.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/evaluation/eval1_{{metric}}_{{eval_dataset}}_{{eval_data_id}}_{{method}}_{{selection_id}}_{{dataset}}_{{data_id}}_pre.benchmark.txt"
     threads: 12    
     conda:
         "envs/venv_spapros.yaml"    
@@ -418,6 +448,8 @@ rule eval2_main:
         unpack(get_eval_main_inputs)
     output:
         expand("{results_dir}/evaluation/{{metric}}/{{metric}}_{{eval_dataset}}_{{eval_data_id}}_{{method}}_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/evaluation/eval2_{{metric}}_{{eval_dataset}}_{{eval_data_id}}_{{method}}_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     threads: 12    
     conda:
         "envs/venv_spapros.yaml"    
@@ -448,6 +480,8 @@ rule eval3_summary:
         data_path = expand("{data_dir}/{{eval_dataset}}_{{eval_data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
     output: 
         expand("{results_dir}/evaluation/{{eval_dataset}}_{{eval_data_id}}_summary.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/evaluation/eval3_{{eval_dataset}}_{{eval_data_id}}_summary.benchmark.txt"
     threads: 12    
     conda:
         "envs/venv_spapros.yaml"    
