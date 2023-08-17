@@ -78,7 +78,13 @@ DEFAULT_PARAMETERS_NON_PSEUDO = {
 }
 
 #TODO: Add list of supported selection methods and assert that given methods are in the list
-
+SELECTION_METHODS = [
+    'spapros', 'DE', 'pca', 'scgenefit', 'nsforest', 'scmer', 'smash', 'asfs', 'cosg', 'triku', 'selfe', 'genebasis', 
+    'scpnmf', 
+]
+EVALUATION_METRICS = [
+    "cluster_similarity", "knn_overlap", "forest_clfs", "marker_corr", "gene_corr",
+]
 
 class ConfigParser():
     
@@ -114,6 +120,11 @@ class ConfigParser():
         if run_evaluations:
             self._check_batch_names()
             
+        # Check if listed selection methods and metrics are supported
+        self._check_selection_methods()
+        if run_evaluations:
+            self._check_evaluation_metrics()
+        
         
         # Set paths
         self.DATA_DIR = self.config['DATA_DIR']
@@ -803,3 +814,46 @@ class ConfigParser():
         return df
         
 
+    def _check_selection_methods(self) -> None:
+        """Check if listed selection methods are supported
+        """
+        not_supported = []
+        for _, batch_dict in self.config["selections"].items():
+            
+            if isinstance(batch_dict["methods"], list):
+                names = batch_dict["methods"]
+            elif " " in batch_dict["methods"]:
+                names = batch_dict["methods"].split(" ")
+            else:
+                names = [batch_dict["methods"]]
+            
+            for method in names:
+                if method not in SELECTION_METHODS:
+                    not_supported.append(method)
+                
+        not_supported = list(set(not_supported))
+                
+        if len(not_supported) > 0:
+            raise ValueError(f"Methods {not_supported} are not supported. \nSupported methods are {SELECTION_METHODS}")
+        
+    def _check_evaluation_metrics(self) -> None:
+        """Check if listed evaluation metrics are supported
+        """
+        not_supported = []
+        for _, batch_dict in self.config["evaluations"].items():
+            
+            if isinstance(batch_dict["metrics"], list):
+                names = batch_dict["metrics"]
+            elif " " in batch_dict["metrics"]:
+                names = batch_dict["metrics"].split(" ")
+            else:
+                names = [batch_dict["metrics"]] 
+                               
+            for metric in names:
+                if metric not in EVALUATION_METRICS:
+                    not_supported.append(metric)
+                
+        not_supported = list(set(not_supported))
+                
+        if len(not_supported) > 0:
+            raise ValueError(f"Metrics {not_supported} are not supported. \nSupported metrics are {EVALUATION_METRICS}")
