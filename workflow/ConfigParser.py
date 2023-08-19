@@ -26,7 +26,7 @@ DEFAULT_PARAMETERS = {
         "n": 100,
         "ct_key": "celltype",
         "gene_key": None,
-        "method_specific_processing": False, # wether to use the method specific normalization/filtering etc. 
+        "method_specific_processing": True, # wether to use the method specific normalization/filtering etc. 
     },
 }
 
