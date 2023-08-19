@@ -54,7 +54,7 @@ selections:
     datasets: [2211_HLCA_subset_raw]
     selection_param:
       n: [50,100,150]
-      ct_key: ["transf_ann_level_1_label", "transf_ann_level_2_label", "transf_ann_level_3_label", "transf_ann_level_4_label", "transf_ann_level_5_label"]  
+      ct_key: ["ann_level_1", "ann_level_2", "ann_level_3", "ann_level_4", "ann_level_5"]
     methods:
       spapros
 #  batch2.2:
