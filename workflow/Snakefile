@@ -64,7 +64,7 @@ rule selection_spapros:
     conda:
         "envs/venv_spapros.yaml"
     log:
-        "logs/selections/spapros_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/spapros_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -88,7 +88,7 @@ rule selection_DE:
     conda:
         "envs/venv_spapros.yaml"
     log:
-        "logs/selections/DE_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/DE_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -112,7 +112,7 @@ rule selection_pca:
         "envs/venv_spapros.yaml"
     threads: 12        
     log:
-        "logs/selections/pca_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/pca_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -136,7 +136,7 @@ rule selection_scgenefit: # spapros, asfs, cosg, nsforest, scmer, triku, smash
         "envs/venv_scgenefit.yaml"
     threads: 12        
     log:
-        "logs/selections/scgenefit_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/scgenefit_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -160,7 +160,7 @@ rule selection_nsforest:
         f"{config['RESULTS_DIR']}/benchmarks/selection/nsforest_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     threads: 12        
     log:
-        "logs/selections/nsforest_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/nsforest_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -184,7 +184,7 @@ rule selection_scmer: # spapros, asfs, cosg, nsforest, scmer, triku, smash
         "envs/venv_selection.yaml"
     threads: 12        
     log:
-        "logs/selections/scmer_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/scmer_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -208,7 +208,7 @@ rule selection_smash:
         "envs/venv_smash.yaml"
     threads: 12        
     log:
-        "logs/selections/smash_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/smash_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -232,7 +232,7 @@ rule selection_asfs:
         "envs/venv_asfs.yaml"
     threads: 12        
     log:
-        "logs/selections/asfs_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/asfs_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -256,7 +256,7 @@ rule selection_cosg:
         "envs/venv_cosg.yaml"
     threads: 12        
     log:
-        "logs/selections/cosg_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/cosg_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -280,7 +280,7 @@ rule selection_triku:
         "envs/venv_triku.yaml"
     threads: 12        
     log:
-        "logs/selections/triku_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/triku_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -304,7 +304,7 @@ rule selection_selfe:
         f"{config['RESULTS_DIR']}/benchmarks/selection/selfe_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     threads: 12        
     log:
-        "logs/selections/selfe_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/selfe_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -328,7 +328,7 @@ rule selection_genebasis:
         f"{config['RESULTS_DIR']}/benchmarks/selection/genebasis_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     threads: 12        
     log:
-        "logs/selections/genebasis_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/genebasis_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
@@ -352,7 +352,7 @@ rule selection_scpnmf:
         f"{config['RESULTS_DIR']}/benchmarks/selection/scpnmf_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     threads: 12        
     log:
-        "logs/selections/scpnmf_{selection_id}_{dataset}_{data_id}.csv"
+        "logs/selections/scpnmf_{selection_id}_{dataset}_{data_id}.txt"
     params:
         selection_params_file = parser.selection_params_file,
         save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
