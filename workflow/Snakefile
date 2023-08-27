@@ -206,7 +206,9 @@ rule selection_smash:
         f"{config['RESULTS_DIR']}/benchmarks/selection/smash_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_smash.yaml"
-    threads: 12        
+    threads: 12
+    resources:
+        mem_mb=160000
     log:
         "logs/selections/smash_{selection_id}_{dataset}_{data_id}.txt"
     params:
@@ -326,7 +328,9 @@ rule selection_genebasis:
         expand("{results_dir}/selection/genebasis_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
     benchmark:
         f"{config['RESULTS_DIR']}/benchmarks/selection/genebasis_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
-    threads: 12        
+    threads: 12
+    resources:
+        mem_mb=160000
     log:
         "logs/selections/genebasis_{selection_id}_{dataset}_{data_id}.txt"
     params:
@@ -350,7 +354,9 @@ rule selection_scpnmf:
         expand("{results_dir}/selection/scpnmf_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
     benchmark:
         f"{config['RESULTS_DIR']}/benchmarks/selection/scpnmf_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
-    threads: 12        
+    threads: 12
+    resources:
+        mem_mb=160000
     log:
         "logs/selections/scpnmf_{selection_id}_{dataset}_{data_id}.txt"
     params:
