@@ -45,11 +45,16 @@ selections:
       nsforest
       scmer
       smash
-      asfs
       cosg
       triku
       selfe
       scpnmf
+  batch2.4:
+    datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
+    selection_param:
+      n: [50]
+    methods:
+      asfs
   batch3:
     datasets: [2211_HLCA_subset_raw]
     selection_param:
@@ -96,7 +101,7 @@ selections:
 #
 evaluations:
   eval_batch2:
-    batches: [batch2, batch2.3]  #batch2.2, TODO: add when probe design constraint was used
+    batches: [batch2, batch2.3, batch2.4]  #batch2.2, TODO: add when probe design constraint was used
     selection_dataset: True
     datasets: []
     dataset_param:
