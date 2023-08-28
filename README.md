@@ -92,3 +92,10 @@ snakemake --profile config/cluster/
 
 ## Configuration file
 TODO: add description of config file
+
+## How to debug pipeline runs
+Surely the pipeline should just run without errors, but in case it doesn't, here are some tips how to debug it:
+- Note that an evaluation summary file for a given dataset configuration is only generated when all respective selections and evaluations are finished.
+- If the configuration file (`config.yaml`) includes many batches, it might be a good idea to add batch after batch and run the pipeline after adding each batch to simplify the debugging if necessary. 
+- Check if rules failed and how they failed: In the `logs` directory open the latest log file that contains `"snakemake"` in the name. In this file search for `Error in rule` (also more specific 1. for data processing `Error in rule p` 2. for selection `Error in rule s` or 3. evaluations `Error in rule e`). Check the error there or copy the job id and check the slurm log file for this job in the `logs` directory.
+- Do not hesitate to create a github issue in case the error is not clear or you think it's a bug. (Please include the error message and the config.yaml file in the issue)
