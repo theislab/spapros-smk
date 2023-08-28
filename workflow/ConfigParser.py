@@ -125,6 +125,8 @@ class ConfigParser():
         if run_evaluations:
             self._check_evaluation_metrics()
         
+        # Check if dataset and selection params are supported
+        self._check_param_keys(run_evaluations)
         
         # Set paths
         self.DATA_DIR = self.config['DATA_DIR']
@@ -857,3 +859,37 @@ class ConfigParser():
                 
         if len(not_supported) > 0:
             raise ValueError(f"Metrics {not_supported} are not supported. \nSupported metrics are {EVALUATION_METRICS}")
+        
+    def _check_param_keys(self, run_evaluations: bool = True) -> None:
+        """Check if listed dataset and selection parameters are supported
+        """
+        
+        for t in ["dataset", "selection"]:
+            not_supported = []
+            
+            for _, batch_dict in self.config["selections"].items():
+                if t + "_param" in batch_dict.keys():
+                    for param in batch_dict[t + "_param"].keys():
+                        if param not in DEFAULT_PARAMETERS[t].keys():
+                            not_supported.append(param)
+        
+            not_supported = list(set(not_supported))
+            
+            if len(not_supported) > 0:
+                raise ValueError(f"In selection config: {t} parameters {not_supported} are not supported. \nSupported parameters are {DEFAULT_PARAMETERS[t].keys()}")
+            
+        if run_evaluations:
+            t = "dataset"
+            
+            not_supported = []
+            
+            for _, batch_dict in self.config["evaluations"].items():
+                for param in batch_dict[t + "_param"].keys():
+                    if param not in DEFAULT_PARAMETERS[t].keys():
+                        not_supported.append(param)
+                        
+            not_supported = list(set(not_supported))
+            
+            if len(not_supported) > 0:
+                raise ValueError(f"In evaluation config: {t} parameters {not_supported} are not supported. \nSupported parameters are {DEFAULT_PARAMETERS[t].keys()}")
+        
