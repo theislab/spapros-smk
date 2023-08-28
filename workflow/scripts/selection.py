@@ -151,9 +151,11 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
 
     ## SCPNMF
     elif method == "scpnmf":
-        from selection_methods.gene_selection_scpnmf import select_genes_scpnmf
+        from selection_methods.gene_selection_scpnmf import select_genes_scpnmf, preprocess_adata_scpnmf
         if proc:
             adata = preprocess_adata(adata)
+        if proc:
+            adata = preprocess_adata_scpnmf(adata, subsample=10000)
         tmp_dir.mkdir(parents=True, exist_ok=True)
         #tmp_dir = os.path.join(out_dir, "tmp")
         #adata = os.path.join(general_params["data_path"],general_params["dataset"])  # need to delete the anndata because otherwise the h5ad file is locked and can't be read by the R script

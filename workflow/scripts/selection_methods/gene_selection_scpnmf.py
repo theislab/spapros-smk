@@ -6,6 +6,22 @@ import time
 import subprocess
 import os
 
+def preprocess_adata_scpnmf(adata, size_factors="size_factors", subsample=10000):
+    """Preprocess adata for method scpnmf
+    
+    I actually just copied the preprocessing from scmer, we only included subsampling on top. Since scpnmf runs into 
+    memory issues we use the same subsample size as for scmer.
+
+    """
+
+    normalise(adata, key=size_factors)
+    sc.pp.log1p(adata)
+    
+    if subsample and (subsample < adata.n_obs):
+        obs = np.random.choice(adata.n_obs, subsample, replace=False)
+        adata = adata[obs]
+
+    return adata
 
 def select_genes_scpnmf(n, adata, r_exe, output_path, K=20, tol=1e-4, maxIter=1000, verboseN=True, zerotol=1e-10,
                         method="EucDist", label=None, mu=1, lam=0.01, seed=123,
