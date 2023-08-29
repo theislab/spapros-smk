@@ -21,6 +21,8 @@ DEFAULT_PARAMETERS = {
         "cells_per_ct_n_seeds" : 1, # Pseudo parameter
         "cells_per_ct_seed": 0,
         "cells_per_ct": None,
+        "bootstrap_n_seeds": None, # Pseudo parameter
+        "bootstrap_seed": None,
     },
     "selection": {
         "n": 100,
@@ -39,6 +41,7 @@ For example, `cells_per_ct_n_seeds = 3` is converted into three configurations w
 PSEUDO_PARAM_TO_PARAM = {
     "dataset": {
         "cells_per_ct_n_seeds": "cells_per_ct_seed",
+        "bootstrap_n_seeds": "bootstrap_seed",
     },
     "selection": {},
 }
@@ -57,11 +60,13 @@ DEFAULT_PARAMETERS_TYPES = {
     "dataset": {
         "dataset": str, # this one is special as it's separate from the dataset_param
         "processing": str,
-        "ct_key": str, # only relevant if e.g. n_cts is specified
+        "ct_key": str, # only relevant if e.g. n_cts is specified (also for others, including bootstrap_n_seeds)
         "n_cts" : int,
         "cells_per_ct_n_seeds" : int,
         "cells_per_ct_seed": int,
         "cells_per_ct": int,
+        "bootstrap_n_seeds": int,
+        "bootstrap_seed": int,
     },
     "selection": {
         "method": str, # this one is special as it's separate from the selection_param 
@@ -529,6 +534,11 @@ class ConfigParser():
         """
         if param == "cells_per_ct_n_seeds":
             return [seed for seed in range(values[0])]
+        elif param == "bootstrap_n_seeds":
+            if values[0] is None:
+                return [None]
+            else:
+                return [seed for seed in range(values[0])]
 
     def _selection_pseudo_parameter_conversion(self, param: str, values: list) -> list:
         """Convert pseudo parameters to actual parameters

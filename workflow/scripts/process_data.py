@@ -2,7 +2,7 @@ import argparse
 import pandas as pd
 import scanpy as sc
 from scipy.sparse import issparse, csr_matrix
-from util import normalise, get_highly_variable, subset_to_n_celltypes, sample_n_cells_per_ct
+from util import normalise, get_highly_variable, subset_to_n_celltypes, sample_n_cells_per_ct, bootstrap_sample
 
 def get_args():
     """Get input arguments"""
@@ -34,6 +34,7 @@ def main():
     n_cts = int(params["n_cts"]) if params["n_cts"] != "None" else None
     cells_per_ct_seed = int(params["cells_per_ct_seed"]) if params["cells_per_ct_seed"] != "None" else None
     cells_per_ct = int(params["cells_per_ct"]) if params["cells_per_ct"] != "None" else None
+    bootstrap_seed = int(params["bootstrap_seed"]) if params["bootstrap_seed"] != "None" else None
     
     # Load data
     adata = sc.read(args.data)
@@ -63,6 +64,11 @@ def main():
     # Subset each cell type to cells_per_ct
     if cells_per_ct is not None:
         adata = sample_n_cells_per_ct(adata, cells_per_ct, ct_key=ct_key, seed=cells_per_ct_seed)
+        
+    # Bootstrap sample of dataset, keep cell type proportions
+    if bootstrap_seed is not None:
+        adata = bootstrap_sample(adata, obs_key=ct_key, noise_level=1e-3, seed=bootstrap_seed, obs_names_unique=True)
+    
     
     # Save data
     if not issparse(adata.X):
