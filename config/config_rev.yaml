@@ -75,6 +75,109 @@ selections:
       n: [50,150]
     methods:
       spapros
+  batch6.1:
+    datasets: [2019Hodge_sn_human_brain_MTG_min20perct]
+    dataset_param:
+      bootstrap_n_seeds: [7]
+    selection_param:
+      n: [50,150]
+      gene_key: ["merfish_gene"] #[None, "merfish_gene"]
+    methods:
+      spapros
+      spaproscto
+      DE
+      pca
+      scgenefit
+      nsforest
+      scmer
+      smash
+      cosg
+      triku
+      selfe
+      scpnmf
+  batch6.2.1:
+    datasets: [merfish_MTG_no_vessels]
+    dataset_param:
+      bootstrap_n_seeds: [7]
+    selection_param:
+      n: [50,150]
+      gene_key: ["sn_genes"] 
+      "ct_key": ["clean_type"]
+    methods:
+      spapros
+      spaproscto
+      DE
+      pca
+      scgenefit
+      nsforest
+      scmer
+      smash
+      cosg
+      triku
+      selfe
+      scpnmf
+  batch6.2.2:
+    datasets: [merfish_MTG_no_vessels]
+    dataset_param:
+      bootstrap_n_seeds: [7]
+    selection_param:
+      n: [50,150]
+      gene_key: ["sn_genes"] 
+      "ct_key": ["cluster_L3"]
+    methods:
+      spapros
+      spaproscto
+      DE
+      pca
+      scgenefit
+      nsforest
+      scmer
+      smash
+      cosg
+      triku
+      selfe
+      scpnmf
+#  batch6.3.1:
+#    datasets: [2211_HLCA_subset_raw]
+#    dataset_param:
+#      bootstrap_n_seeds: [7]
+#    selection_param:
+#      n: [50,150]
+#      "ct_key": ["ann_level_1"]
+#    methods:
+#      spapros
+#      spaproscto
+#      DE
+#      pca
+#      scgenefit
+#      nsforest
+#      scmer
+#      smash
+#      cosg
+#      triku
+#      selfe
+#      scpnmf
+#  batch6.3.2:
+#    datasets: [2211_HLCA_subset_raw]
+#    dataset_param:
+#      bootstrap_n_seeds: [7]
+#    selection_param:
+#      n: [50,150]
+#      "ct_key": ["ann_level_3"]
+#    methods:
+#      spapros
+#      spaproscto
+#      DE
+#      pca
+#      scgenefit
+#      nsforest
+#      scmer
+#      smash
+#      cosg
+#      triku
+#      selfe
+#      scpnmf
+    
 #  batch2.2:
 #    datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
 #    selection_param:
@@ -125,6 +228,46 @@ evaluations:
       processing: [lognorm]
       ct_key: [clean_type, cluster_L3]
     metrics: [knn_overlap, forest_clfs]
+  eval_batch6.1:
+    batches: [batch6.1, batch6.2.1]
+    selection_dataset: False
+    datasets: [2019Hodge_sn_human_brain_MTG_min20perct]
+    dataset_param:
+      processing: [lognorm]
+      ct_key: [celltype]
+    metrics: [cluster_similarity, knn_overlap, forest_clfs]
+  eval_batch6.2.1:
+    batches: [batch6.1, batch6.2.1]
+    selection_dataset: False
+    datasets: [merfish_MTG_no_vessels]
+    dataset_param:
+      processing: [lognorm]
+      ct_key: [clean_type]
+    metrics: [cluster_similarity, knn_overlap, forest_clfs]
+  eval_batch6.2.2:
+    batches: [batch6.2.1, batch6.2.2]
+    selection_dataset: False
+    datasets: [merfish_MTG_no_vessels]
+    dataset_param:
+      processing: [lognorm]
+      ct_key: [cluster_L3]
+    metrics: [cluster_similarity, knn_overlap, forest_clfs]
+#  eval_batch6.3.1:
+#    batches: [batch6.3.1]
+#    selection_dataset: False
+#    datasets: [2211_HLCA_subset_raw]
+#    dataset_param:
+#      processing: [lognorm]
+#      ct_key: [ann_level_1]
+#    metrics: [cluster_similarity, knn_overlap, forest_clfs]
+#  eval_batch6.3.2:
+#    batches: [batch6.3.1, batch6.3.2]
+#    selection_dataset: False
+#    datasets: [2211_HLCA_subset_raw]
+#    dataset_param:
+#      processing: [lognorm]
+#      ct_key: [ann_level_3]
+#    metrics: [cluster_similarity, knn_overlap, forest_clfs]
 #  eval_batch2:
 #    batches: [batch2, batch2.2, batch2.3]
 #    selection_dataset: True
