@@ -115,7 +115,7 @@ evaluations:
       processing: [lognorm]
     metrics: [cluster_similarity, knn_overlap, forest_clfs]
   eval_batch1.2:
-    batches: [batch1.2]
+    batches: [batch1,batch1.2]
     selection_dataset: False
     datasets: [merfish_MTG, merfish_MTG_no_vessels]
     dataset_param:
