@@ -15,18 +15,20 @@ selections:
       gene_key: ["merfish_gene"] #[None, "merfish_gene"]
     methods:
       spapros
+      spaproscto
       nsforest
       scmer
       DE
   batch1.2:
     datasets: [2019Hodge_sn_human_brain_MTG_min20perct]
     dataset_param:
-      cells_per_ct: [50,100,200,500,1000,None]
+      cells_per_ct: [10,25,50,100,200,500,1000,None]
     selection_param:
       n: [50,150]
       gene_key: ["merfish_gene"] #[None, "merfish_gene"]      
     methods:
       spapros
+      spaproscto
   batch2:
     datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
     selection_param:
@@ -39,6 +41,7 @@ selections:
       n: [50,150]
     methods:
       spapros
+      spaproscto
       DE
       pca
       scgenefit
