@@ -92,9 +92,13 @@ def main():
         # Solution: group probesets per set of metrics and set evaluator.metrics for each group separately.
         
         # Group probeset_ids based on set of metrics
-        probeset_ids = df_eval.loc[
-            (df_eval["eval_dataset"].astype(str) + "_" + df_eval["eval_data_id"].astype(str)) == eval_dataset, "selection_name"
-        ].unique().tolist()
+        df_eval = df_eval.loc[
+            (df_eval["eval_dataset"].astype(str) + "_" + df_eval["eval_data_id"].astype(str)) == eval_dataset
+        ]
+        probeset_ids = df_eval["selection_name"].unique().tolist()
+        #probeset_ids = df_eval.loc[
+        #    (df_eval["eval_dataset"].astype(str) + "_" + df_eval["eval_data_id"].astype(str)) == eval_dataset, "selection_name"
+        #].unique().tolist()
         
         probeset_id_to_metrics = {
             p_id:frozenset(df_eval.loc[df_eval["selection_name"] == p_id,"metric"].values.tolist()) for p_id in probeset_ids

@@ -33,7 +33,7 @@ To set the config edit the file `spapros-smk/config/config.yaml`. (details see b
 conda activate spapros_smk
 cd spapros-smk
 
-snakemake -n c1??
+snakemake -n
 ```
 
 ## Run on current machine
