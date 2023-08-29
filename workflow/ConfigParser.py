@@ -80,7 +80,7 @@ DEFAULT_PARAMETERS_NON_PSEUDO = {
 #TODO: Add list of supported selection methods and assert that given methods are in the list
 SELECTION_METHODS = [
     'spapros', 'DE', 'pca', 'scgenefit', 'nsforest', 'scmer', 'smash', 'asfs', 'cosg', 'triku', 'selfe', 'genebasis', 
-    'scpnmf', 
+    'scpnmf', 'spaproscto',
 ]
 EVALUATION_METRICS = [
     "cluster_similarity", "knn_overlap", "forest_clfs", "marker_corr", "gene_corr",

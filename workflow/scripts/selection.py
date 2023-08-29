@@ -105,6 +105,36 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
         
         selection = get_selection_df(adata, selector.probeset.loc[selector.probeset["selection"]].index.tolist())
         
+    # SPAPROS-CTO
+    if method == "spaproscto":
+        import spapros as sp
+        if proc:
+            adata = preprocess_adata(adata)
+        kwargs["n_min_markers"] = 0
+        kwargs["genes_key"] = gene_key
+        if save_specific_output:
+            kwargs["save_dir"] = specific_dir
+            
+        selector = sp.se.ProbesetSelector(adata,ct_key,n=n,n_pca_genes=0,**kwargs,verbosity=0,n_jobs=-1)
+        start = time.time()
+        selector.select_probeset()
+        genes1 = selector.probeset.loc[selector.probeset["selection"]].index.tolist()
+        selection1 = get_selection_df(adata, genes1)        
+        
+        # Run a 2nd selection if not enough genes were selected in the first round
+        if len(genes1) < n:
+            if save_specific_output:
+                kwargs["save_dir"] = Path(specific_dir,"_run2")
+            selector = sp.se.ProbesetSelector(
+                adata[:,~adata.var_names.isin(genes1)],ct_key,n=n-len(genes1),n_pca_genes=0,**kwargs,verbosity=0,
+                n_jobs=-1
+            )
+            selector.select_probeset()
+            selection = get_selection_df(adata, genes1 + selector.probeset.loc[selector.probeset["selection"]].index.tolist())
+        else:
+            selection = selection1
+            
+        computation_time = time.time() - start
     
     # PCA
     elif method == "pca":
