@@ -137,7 +137,12 @@ class ConfigParser():
         self.DATA_DIR = self.config['DATA_DIR']
         self.DATA_DIR_TMP = self.config['DATA_DIR_TMP']
         self.RESULTS_DIR = self.config['RESULTS_DIR']
+        if self.RESULTS_DIR[0] == "/":
+            self.RESULTS_DIR_ABS = self.RESULTS_DIR
+        else:
+            self.RESULTS_DIR_ABS = Path("../",self.RESULTS_DIR).resolve()
         self.SAVE_METHOD_SPECIFIC_OUTPUT = self.config['SAVE_METHOD_SPECIFIC_OUTPUT']
+        self.PRELIMINARY_EVAL_SUMMARY = self.config['PRELIMINARY_EVAL_SUMMARY']
         
         # Make dirs
         if save_files:
@@ -271,6 +276,12 @@ class ConfigParser():
         # Get all pipeline output file names
         self.file_names["pipeline_output"] = self.file_names["evaluation_summary"] + self.file_names["non_evaluated_selection"]
         
+        # Special flag: self.PRELIMINARY_EVAL_SUMMARY | only summarise currently available evaluation files
+        if self.PRELIMINARY_EVAL_SUMMARY:
+            self.file_names["pipeline_output"] = [
+                f.rsplit("/",1)[0] + "/prelim_summary/" + f.rsplit("/",1)[-1] for f in self.file_names["evaluation_summary"]
+            ]
+        
    
     def get_evaluation_files_to_summarise(self, eval_dataset: str, eval_data_id: int) -> List[str]: 
         """Get the evaluation files to compute summary metrics for a given evaluation dataset
@@ -280,6 +291,9 @@ class ConfigParser():
         eval_files = df.loc[
             (df["eval_dataset"] == eval_dataset) & (df["eval_data_id"] == int(eval_data_id)), "eval_file_name"
         ].unique().tolist()
+        
+        if self.PRELIMINARY_EVAL_SUMMARY:
+            eval_files = [f for f in eval_files if Path(self.RESULTS_DIR_ABS, f).is_file()]
         
         return eval_files
    

@@ -19,6 +19,7 @@ def get_args():
     parser.add_argument('-s', '--selection', help='Selection name', required=False, type=str)
     parser.add_argument('-E', '--evaluation_overview_file', help='Evaluation overview csv path', required=False, type=str)
     parser.add_argument('-D', '--dataset_params_file', help='Dataset parameter overview csv path', required=True, type=str)
+    parser.add_argument('-p', '--prelim_summary', help='Whether to calculate summary on available subset of results', required=False, type=bool, default=False)
     
     return parser.parse_args()
     
@@ -41,7 +42,8 @@ def main():
         df_eval = pd.read_csv(args.evaluation_overview_file, index_col=0)    
     else:
         metric = args.metric
-        selection_name = args.selection    
+        selection_name = args.selection  
+    prelim_summary = args.prelim_summary  
     
     
     print("################")
@@ -61,7 +63,8 @@ def main():
     
     evaluator = sp.ev.ProbesetEvaluator(
         adata, verbosity=0, 
-        results_dir=Path(output_dir, "evaluation"), celltype_key=ct_key,
+        results_dir=Path(output_dir, "evaluation"),
+        celltype_key=ct_key,
         scheme="custom", 
         metrics=[metric] if (eval_step != "summary") else [],
         reference_name=eval_dataset 
@@ -87,6 +90,9 @@ def main():
         evaluator.evaluate_probeset(gene_set, selection_name, pre_only=(eval_step == "pre"), update_summary=False)
 
     elif eval_step == "summary":
+        
+        if prelim_summary:
+            evaluator._summary_file = str(Path(output_dir, "evaluation", "prelim_summary", evaluator.ref_name+"_summary.csv"))
         # Problem: evaluator.summary_statistics assumed that all probesets are evaluated for the same set of metrics, 
         #          which is not necessarily given here.
         # Solution: group probesets per set of metrics and set evaluator.metrics for each group separately.

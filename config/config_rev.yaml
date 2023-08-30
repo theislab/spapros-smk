@@ -5,6 +5,8 @@ DATA_DIR: /lustre/groups/ml01/workspace/louis.kuemmerle/projects/G1/data/process
 DATA_DIR_TMP: /lustre/groups/ml01/workspace/louis.kuemmerle/projects/G1/data/processed_rev/tmp_data
 RESULTS_DIR: /lustre/groups/ml01/workspace/louis.kuemmerle/projects/G1/results/spapros_smk_res
 SAVE_METHOD_SPECIFIC_OUTPUT: True # Whether to save method specific output of the selection methods (will be in RESULTS_DIR+"method_specific/{run}/")
+PRELIMINARY_EVAL_SUMMARY: False # Whether to just summarise the currently available evaluation results and not run anything else.
+# NOTE: PRELIMINARY_EVAL_SUMMARY can lead to wrong values for set ids that partially miss evaluation files!!!
 
 
 selections:
@@ -98,6 +100,7 @@ selections:
   batch6.2.1:
     datasets: [merfish_MTG_no_vessels]
     dataset_param:
+      ct_key: [clean_type]
       bootstrap_n_seeds: [7]
     selection_param:
       n: [50,150]
@@ -119,6 +122,7 @@ selections:
   batch6.2.2:
     datasets: [merfish_MTG_no_vessels]
     dataset_param:
+      ct_key: [cluster_L3]
       bootstrap_n_seeds: [7]
     selection_param:
       n: [50,150]

@@ -527,3 +527,27 @@ rule eval3_summary:
         "--evaluation_overview_file {params.evaluation_overview_file} " 
         "--dataset_params_file {params.dataset_params_file} "     
 
+
+rule special_prelim_eval3_summary:
+    input:
+        get_evaluation_files_to_summarise,
+        data_path = expand("{data_dir}/{{eval_dataset}}_{{eval_data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output: 
+        expand("{results_dir}/evaluation/prelim_summary/{{eval_dataset}}_{{eval_data_id}}_summary.csv", results_dir=config['RESULTS_DIR'])
+    threads: 12    
+    conda:
+        "envs/venv_spapros.yaml"    
+    params:
+        results_dir = config['RESULTS_DIR'],
+        evaluation_overview_file = parser.evaluation_overview_file,
+        dataset_params_file = parser.data_params_file
+    shell:
+        "python workflow/scripts/evaluation.py "
+        "--eval_step summary "
+        "--data {input.data_path} "
+        "--results_dir {params.results_dir} "
+        "--evaluation_overview_file {params.evaluation_overview_file} " 
+        "--dataset_params_file {params.dataset_params_file} " 
+        "--prelim_summary True " 
+
+
