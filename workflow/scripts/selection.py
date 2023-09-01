@@ -206,7 +206,29 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
         if proc:
             adata = preprocess_adata_scmer(adata, n_pcs=30, subsample=10000)
         kwargs["n_threads"] = -1
-        selection, computation_time = select_genes_scmer(n, adata, **kwargs)
+        selection_scmer, computation_time = select_genes_scmer(n, adata, **kwargs)
+        
+        if len(selection_scmer) == n:
+            selection = selection_scmer
+        else:
+            print("SCMER selected ", len(selection_scmer), "genes, but ", n, "were requested. Adding/removing based on pca scores.")
+            from util import select_pca_genes
+            pca_scores = select_pca_genes(adata, 0, inplace=False)
+            
+            pca_scores['idx'] = range(adata.shape[1])
+            pca_scores["scmer_selection"] = False
+            pca_scores.loc[selection_scmer["selection"].values, "selection"] = True
+            pca_scores.loc[selection_scmer["selection"].values, "scmer_selection"] = True
+            pca_scores = pca_scores.sort_values(["selection","selection_score"],ascending=[False,False])
+            # set first n values of "selection" to True and rest to False
+            pca_scores["selection"] = False
+            pca_scores.loc[pca_scores.index[:n], "selection"] = True
+            
+            if save_specific_output:
+                Path(specific_dir).mkdir(parents=True, exist_ok=True)
+                pca_scores.to_csv(Path(specific_dir) / "selection_adjusted_to_n_genes.csv")
+            
+            selection = get_selection_df(adata, pca_scores.loc[pca_scores["selection"]].index.tolist())
 
     # SMASH
     elif method == "smash":

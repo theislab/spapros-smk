@@ -4,6 +4,7 @@ import pandas as pd
 import scanpy as sc
 from scipy.sparse import issparse, csr_matrix
 from sklearn.utils import sparsefuncs
+from typing import Optional, List
 
 def normalise(adata, key='size_factors'):
     """Normalise raw counts adata with size factors
@@ -203,3 +204,146 @@ def bootstrap_sample(adata, obs_key=None, noise_level=1e-3, seed=None, obs_names
         bootstrap_adata.obs_names_make_unique(join="-")
     
     return bootstrap_adata
+
+
+def clean_adata(
+    adata: sc.AnnData,
+    obs_keys: Optional[List[str]] = None,
+    var_keys: Optional[List[str]] = None,
+    uns_keys: Optional[List[str]] = None,
+    obsm_keys: Optional[List[str]] = None,
+    varm_keys: Optional[List[str]] = None,
+    obsp_keys: Optional[List[str]] = None,
+    inplace: bool = True,
+) -> Optional[sc.AnnData]:
+    """Removes unwanted attributes of an adata object.
+
+    Args:
+        adata:
+            Anndata object.
+        obs_keys:
+            Columns in `adata.obs` to keep.
+        var_keys:
+            Columns in `adata.var` to keep.
+        uns_keys:
+            Keys of `adata.uns` to keep.
+        obsm_keys:
+            Columns of `adata.obsm` to keep.
+        varm_keys:
+            Columns of `adata.varm` to keep.
+        obsp_keys:
+            Keys of `adata.obsp` to keep.
+        inplace:
+
+    Returns:
+        If not inpace, the cleaned Anndata without any annotation.
+    """
+    if not obs_keys:
+        obs_keys = []
+    if not var_keys:
+        var_keys = []
+    if not uns_keys:
+        uns_keys = []
+    if not obsm_keys:
+        obsm_keys = []
+    if not varm_keys:
+        varm_keys = []
+
+    if inplace:
+        a = adata
+    else:
+        a = adata.copy()
+    for obs in [o for o in a.obs_keys() if o not in obs_keys]:
+        del a.obs[obs]
+    for var in [v for v in a.var_keys() if v not in var_keys]:
+        del a.var[var]
+    for uns in [u for u in a.uns_keys() if u not in uns_keys]:
+        del a.uns[uns]
+    for obsm in [om for om in a.obsm_keys() if om not in obsm_keys]:
+        del a.obsm[obsm]
+    for varm in [vm for vm in a.varm_keys() if vm not in varm_keys]:
+        del a.varm[varm]
+    # for obsp in [op for op in a.obsp_keys() if not op in obsp_keys]:
+    # 	del a.obsp[obsp]
+    if not inplace:
+        return a
+    else:
+        return None
+
+
+
+def select_pca_genes(
+    adata: sc.AnnData,
+    n: int,
+    absolute: bool = True,
+    n_pcs: int = 20,
+    inplace: bool = True,
+) -> pd.DataFrame:
+    """Select n features based on pca loadings.
+
+    Args:
+        adata:
+            Data with log normalised counts in adata.X.
+        n:
+            Number of selected features.
+        absolute:
+            Take absolute value of loadings.
+        n_pcs:
+            Number of PCs used to calculate loadings sums.
+        inplace:
+            Save results in :attr:`adata.var` or return dataframe.
+
+    Returns:
+
+        - if not inplace:
+            pd.DataFrame (like adata.var) with columns:
+
+                - 'selection': bool indicator of selected genes
+                - 'selection_score': pca loadings based score of each gene
+                - 'selection_ranking': ranking according selection scores
+
+        - if inplace:
+            Save results in `adata.var[['selection','selection_score','selection_ranking']]`.
+
+    """
+
+    a = adata.copy()
+
+    if n_pcs > a.n_vars:
+        n_pcs = a.n_vars
+
+    clean_adata(a)
+
+    sc.pp.pca(
+        a,
+        n_comps=n_pcs,
+        zero_center=True,
+        svd_solver="arpack",
+        random_state=0,
+        return_info=True,
+        copy=False,
+    )
+
+    loadings = a.varm["PCs"].copy()[:, :n_pcs]
+    if absolute:
+        loadings = abs(loadings)
+
+    scores = pd.DataFrame(index=adata.var.index, data={"scores": np.sum(loadings, axis=1)})
+
+    selected_genes = scores.nlargest(n, "scores").index.values
+    selection = pd.DataFrame(
+        index=scores.index,
+        data={
+            "selection": False,
+            "selection_score": scores["scores"],
+            "selection_ranking": scores["scores"].rank(method="dense", ascending=False),
+        },
+    )
+    selection.loc[selected_genes, "selection"] = True
+
+    if inplace:
+        adata.var[["selection", "selection_score", "selection_ranking"]] = selection[
+            ["selection", "selection_score", "selection_ranking"]
+        ]
+    else:
+        return selection
