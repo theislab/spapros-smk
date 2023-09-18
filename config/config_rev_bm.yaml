@@ -1,0 +1,50 @@
+
+# when using relative paths: note that the working directory is the pwd of the terminal from where snakemake is run, 
+# this should be .../spapros-smk  (also possible: .../spapros-smk/workflow, might mess things up though)
+DATA_DIR: /lustre/groups/ml01/workspace/louis.kuemmerle/projects/G1/data/processed_rev
+DATA_DIR_TMP: /lustre/groups/ml01/workspace/louis.kuemmerle/projects/G1/data/processed_rev/tmp_data_bm
+RESULTS_DIR: /lustre/groups/ml01/workspace/louis.kuemmerle/projects/G1/results/spapros_smk_res_bm
+SAVE_METHOD_SPECIFIC_OUTPUT: True # Whether to save method specific output of the selection methods (will be in RESULTS_DIR+"method_specific/{run}/")
+PRELIMINARY_EVAL_SUMMARY: False # Whether to just summarise the currently available evaluation results and not run anything else.
+# NOTE: PRELIMINARY_EVAL_SUMMARY can lead to wrong values for set ids that partially miss evaluation files!!!
+
+
+selections:
+  batch_bm_1.1:
+    datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
+    dataset_param:
+      bootstrap_n_seeds: [20]
+    selection_param:
+      n: [50,150]
+    methods:
+      spapros
+      spaproscto
+      DE
+      pca
+      scgenefit
+      nsforest
+      scmer
+      cosg
+      triku
+      selfe
+      scpnmf
+      genebasis
+      smash
+  batch_bm_1.2:
+    datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
+    dataset_param:
+      bootstrap_n_seeds: [20]
+    selection_param:
+      n: [50]
+    methods:
+      asfs
+
+
+evaluations:
+  eval_batch_bm_1:
+    batches: [batch_bm_1.1, batch_bm_1.2]
+    selection_dataset: True
+    datasets: []
+    dataset_param:
+      processing: [lognorm]    
+    metrics: [cluster_similarity,  knn_overlap,  forest_clfs, gene_corr]
