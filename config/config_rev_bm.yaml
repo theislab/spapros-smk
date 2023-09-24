@@ -29,22 +29,43 @@ selections:
       selfe
       scpnmf
       genebasis
-      smash
-  batch_bm_1.2:
-    datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
+      #smash
+  batch_bm_2.1:
+    datasets: [HLCA-raw, liver-raw, tabula_muris_senis-raw, kolabas_mouse_bone_marrow, thymus-raw] #, bone_marrow-raw, immune-raw, pbmc1k-raw, krasnow-raw, primary_motor_cortex_mmus-raw] #heart-raw, heart_atlas-raw, 
     dataset_param:
-      bootstrap_n_seeds: [20]
+      bootstrap_n_seeds: [5]
     selection_param:
-      n: [50]
+      n: [50,150]
     methods:
-      asfs
+      spapros
+      spaproscto
+      DE
+      pca
+      nsforest
+      scmer
+      selfe
+      #scgenefit
+      #cosg
+      #triku
+      #scpnmf
+      #genebasis
+      #smash
+  #batch_bm_1.2:
+  #  datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
+  #  dataset_param:
+  #    bootstrap_n_seeds: [20]
+  #  selection_param:
+  #    n: [50]
+  #  methods:
+  #    asfs
+
 
 
 evaluations:
   eval_batch_bm_1:
-    batches: [batch_bm_1.1, batch_bm_1.2]
+    batches: [batch_bm_1.1, batch_bm_2.1] # batch_bm_1.2, , batch_bm_2.2
     selection_dataset: True
     datasets: []
     dataset_param:
       processing: [lognorm]    
-    metrics: [cluster_similarity,  knn_overlap,  forest_clfs, gene_corr]
+    metrics: [cluster_similarity,  knn_overlap,  forest_clfs] #, gene_corr]
