@@ -26,6 +26,8 @@ rule all:
 
 rule process_data:
     threads: 12
+    resources:
+        mem_mb = lambda wildcards, attempt: 64000 * (attempt + int(attempt > 1))
     conda:
         "envs/base_env.yaml"
     input:
