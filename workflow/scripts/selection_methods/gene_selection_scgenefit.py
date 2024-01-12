@@ -70,6 +70,9 @@ def select_genes_scgenefit(n, adata, label, hierarchical=False, size_factors="si
 
     #adata = preprocess_adata_scgenefit(adata, hyper_parameter1, size_factors=size_factors)
 
+    np.random.seed(0) # As recommended in the scgenefit repo, however there seems to be additional randomness
+                      # when running wih hierarchical = False.
+
     if type(label) == str:
         labels = np.array(adata.obs[label])
 
@@ -84,14 +87,14 @@ def select_genes_scgenefit(n, adata, label, hierarchical=False, size_factors="si
         start = time.time()
 
 
-        idx = get_markers_hierarchy(data=adata_cp, labels=label, num_markers=n, method=method,
+        idx = get_markers_hierarchy(data=adata_cp, labels=labels, num_markers=n, method=method,
                                               epsilon=epsilon, sampling_rate=sampling_rate, n_neighbors=n_neighbors,
                                               max_constraints=max_constraints, redundancy=redundancy, verbose=verbose)
         end = time.time()
     # non-hierarchical variant
     else:
         start = time.time()
-        idx = get_markers(data=adata_cp, labels=label, num_markers=n, method=method,
+        idx = get_markers(data=adata_cp, labels=labels, num_markers=n, method=method,
                                     epsilon=epsilon, sampling_rate=sampling_rate, n_neighbors=n_neighbors,
                                     max_constraints=max_constraints, redundancy=redundancy, verbose=verbose)
         end = time.time()

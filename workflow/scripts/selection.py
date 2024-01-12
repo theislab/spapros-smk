@@ -165,8 +165,8 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
         from selection_methods.gene_selection_scgenefit import select_genes_scgenefit, preprocess_adata_scgenefit
         if proc:
             adata = preprocess_adata_scgenefit(adata) #, **kwargs)
-        kwargs["hierarchical"] = True
-        kwargs["epsilon"] = 0.5          
+        kwargs["hierarchical"] = False
+        kwargs["epsilon"] = 10
         selection, computation_time = select_genes_scgenefit(n,adata=adata,label=ct_key,**kwargs)
 
     # NSFOREST
