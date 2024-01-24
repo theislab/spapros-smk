@@ -3,6 +3,7 @@ import time
 from pathlib import Path
 import sys
 import argparse
+import numpy as np
 import pandas as pd
 import scanpy as sc
 from util import preprocess_adata, get_selection_df
@@ -159,6 +160,34 @@ def run_selection(method, adata, n, ct_key, gene_key, proc, kwargs, selection_cs
         computation_time = time.time() - start
         
         selection = get_selection_df(adata, selection.loc[selection["selection"]].index.tolist())
+    
+    # PERSIST
+    elif method == "persist":
+        from selection_methods.gene_selection_persist import select_genes_persist, preprocess_adata_persist
+        if proc:
+            adata = preprocess_adata_persist(adata, ct_key=ct_key)
+        else:
+            adata.layers['bin'] = (adata.X>0).astype(np.float32)
+        
+        start = time.time()
+        genes = select_genes_persist(n, adata, ct_key=ct_key, classification=True, **kwargs)
+        computation_time = time.time() - start
+        
+        selection = get_selection_df(adata, genes)
+        
+    # PERSIST unsupervised
+    elif method == "persistus":
+        from selection_methods.gene_selection_persist import select_genes_persist, preprocess_adata_persist
+        if proc:
+            adata = preprocess_adata_persist(adata, ct_key=ct_key)
+        else:
+            adata.layers['bin'] = (adata.X>0).astype(np.float32)
+        
+        start = time.time()
+        genes = select_genes_persist(n, adata, ct_key=ct_key, classification=False, **kwargs)
+        computation_time = time.time() - start
+        
+        selection = get_selection_df(adata, genes)
     
     # SCGENEFIT
     elif method == "scgenefit":

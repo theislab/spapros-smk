@@ -1,0 +1,12 @@
+name: persist
+channels:
+  - conda-forge
+  - defaults
+  - nvidia
+dependencies:
+  - python=3.9
+  - numpy=1.23.5
+  - cudatoolkit=11.8
+  - pip
+  - pip:
+    - git+https://github.com/iancovert/persist.git#egg=persist

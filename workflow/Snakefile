@@ -151,6 +151,64 @@ rule selection_pca:
         "-f {params.selection_params_file} "
         "-s {params.save_method_specific_output}"
 
+rule selection_persist:
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/persist_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/persist_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
+    conda:
+        "envs/venv_persist.yaml"
+    threads: 6
+    resources:
+        partition="gpu",
+        qos="gpu_normal",
+        mem_mb=64000,
+        gres="gpu:1" 
+    log:
+        "logs/selections/persist_{selection_id}_{dataset}_{data_id}.txt"
+    params:
+        selection_params_file = parser.selection_params_file,
+        save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
+    shell:
+        "python workflow/scripts/selection.py "
+        "--data {input} "
+        "-o {output} "
+        "--method persist "
+        "-id {wildcards.selection_id} "
+        "-f {params.selection_params_file} "
+        "-s {params.save_method_specific_output}"
+        
+rule selection_persistus: # persist with unsupervised optimisation
+    input:
+        expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
+    output:
+        expand("{results_dir}/selection/persistus_{{selection_id}}_{{dataset}}_{{data_id}}.csv", results_dir=config['RESULTS_DIR'])
+    benchmark:
+        f"{config['RESULTS_DIR']}/benchmarks/selection/persistus_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
+    conda:
+        "envs/venv_persist.yaml"
+    threads: 6
+    resources:
+        partition="gpu",
+        qos="gpu_normal",
+        mem_mb=64000,
+        gres="gpu:1"        
+    log:
+        "logs/selections/persistus_{selection_id}_{dataset}_{data_id}.txt"
+    params:
+        selection_params_file = parser.selection_params_file,
+        save_method_specific_output = config['SAVE_METHOD_SPECIFIC_OUTPUT']
+    shell:
+        "python workflow/scripts/selection.py "
+        "--data {input} "
+        "-o {output} "
+        "--method persistus "
+        "-id {wildcards.selection_id} "
+        "-f {params.selection_params_file} "
+        "-s {params.save_method_specific_output}"
+
 rule selection_scgenefit: # spapros, asfs, cosg, nsforest, scmer, triku, smash
     input:
         expand("{data_dir}/{{dataset}}_{{data_id}}.h5ad", data_dir=config['DATA_DIR_TMP'])
@@ -160,7 +218,7 @@ rule selection_scgenefit: # spapros, asfs, cosg, nsforest, scmer, triku, smash
         f"{config['RESULTS_DIR']}/benchmarks/selection/scgenefit_{{selection_id}}_{{dataset}}_{{data_id}}.benchmark.txt"
     conda:
         "envs/venv_scgenefit.yaml"
-    threads: 12        
+    threads: 12
     log:
         "logs/selections/scgenefit_{selection_id}_{dataset}_{data_id}.txt"
     params:
