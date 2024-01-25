@@ -29,6 +29,8 @@ selections:
       selfe
       scpnmf
       genebasis
+      persist
+      persistus
       #smash
   batch_bm_2.1:
     datasets: [HLCA-raw_subsampled, liver-raw, tabula_muris_senis-raw_subsampled, kolabas_mouse_bone_marrow_subsampled, thymus-raw_subsampled, bone_marrow-raw, immune-raw_subsampled, pbmc1k-raw, krasnow-raw, primary_motor_cortex_mmus-raw_subsampled] #heart-raw_subsampled, heart_atlas-raw_subsampled, 
@@ -44,6 +46,7 @@ selections:
       nsforest
       scmer
       selfe
+      genebasis  
   batchQ3.7:
     datasets: [2019Hodge_sn_human_brain_MTG_min20perct]
     dataset_param:
