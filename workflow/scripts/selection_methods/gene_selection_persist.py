@@ -29,7 +29,7 @@ def preprocess_adata_persist(adata, ct_key="celltype", size_factors="size_factor
 
 
 
-def select_genes_persist(n, adata, ct_key="celltype", classification=False, train_size=0.8, max_nepochs=250):
+def select_genes_persist(n, adata, ct_key="celltype", classification=False, train_size=0.8, max_nepochs=250, max_trials=100):
     """
     
     Parameter
@@ -40,6 +40,8 @@ def select_genes_persist(n, adata, ct_key="celltype", classification=False, trai
         Ratio for training data size for train test split.
     max_nepochs: int
         Max number of epochs for elimination and selection.
+    max_trials: int
+        Number of trials for the elimination step before it throws an Error.
     
     
     """
@@ -87,7 +89,7 @@ def select_genes_persist(n, adata, ct_key="celltype", classification=False, trai
     
         # Coarse removal of genes
         print('Starting initial elimination...')
-        candidates, model = selector.eliminate(target=500, max_nepochs=max_nepochs)
+        candidates, model = selector.eliminate(target=500, max_nepochs=max_nepochs, max_trials=max_trials)
         print('Completed initial elimination.')
         
         print('Selecting specific number of genes...')
