@@ -162,7 +162,7 @@ rule selection_persist:
         "envs/venv_persist.yaml"
     threads: 6
     resources:
-        partition="gpu",
+        partition="gpu_p",
         qos="gpu_normal",
         mem_mb=64000,
         gres="gpu:1" 
@@ -191,7 +191,7 @@ rule selection_persistus: # persist with unsupervised optimisation
         "envs/venv_persist.yaml"
     threads: 6
     resources:
-        partition="gpu",
+        partition="gpu_p",
         qos="gpu_normal",
         mem_mb=64000,
         gres="gpu:1"        
