@@ -124,9 +124,9 @@ selections:
       triku
       selfe
       scpnmf
-      genebasis
-      persist
-      persistus
+      #genebasis
+      #persist
+      #persistus
   batch6.2.2:
     datasets: [merfish_MTG_no_vessels]
     dataset_param:
@@ -149,9 +149,9 @@ selections:
       triku
       selfe
       scpnmf
-      genebasis
-      persist
-      persistus
+      #genebasis
+      #persist
+      #persistus
 #  batch6.3.1:
 #    datasets: [2211_HLCA_subset_raw]
 #    dataset_param:
