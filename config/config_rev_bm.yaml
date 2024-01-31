@@ -32,6 +32,24 @@ selections:
       #persist
       #persistus
       #smash
+  batch_bm_1.2:
+    datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
+    dataset_param:
+      bootstrap_n_seeds: [20]
+    selection_param:
+      n: [50]
+    methods:
+      asfs
+  batch_bm_1.3:
+    datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
+    dataset_param:
+      bootstrap_n_seeds: [5]
+    selection_param:
+      n: [50,150]
+    methods:
+      persist
+      persistus
+      smash
   batch_bm_2.1:
     datasets: [HLCA-raw_subsampled, liver-raw, tabula_muris_senis-raw_subsampled, kolabas_mouse_bone_marrow_subsampled, thymus-raw_subsampled, bone_marrow-raw, immune-raw_subsampled, pbmc1k-raw, krasnow-raw, primary_motor_cortex_mmus-raw_subsampled] #heart-raw_subsampled, heart_atlas-raw_subsampled, 
     dataset_param:
@@ -76,20 +94,12 @@ selections:
   #    #scpnmf
   #    #genebasis
   #    #smash
-  #batch_bm_1.2:
-  #  datasets: [Madissoon2019_w_cts, Litvinukova2020_w_cts]
-  #  dataset_param:
-  #    bootstrap_n_seeds: [20]
-  #  selection_param:
-  #    n: [50]
-  #  methods:
-  #    asfs
 
 
 
 evaluations:
   eval_batch_bm_1:
-    batches: [batch_bm_1.1, batch_bm_2.1] # batch_bm_1.2, , batch_bm_2.2
+    batches: [batch_bm_1.1, batch_bm_1.2, batch_bm_1.3, batch_bm_2.1] #  , batch_bm_2.2
     selection_dataset: True
     datasets: []
     dataset_param:
