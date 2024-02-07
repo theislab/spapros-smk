@@ -15,7 +15,7 @@ import pandas as pd
 
 DEFAULT_PARAMETERS = {
     "dataset": {
-        "processing": None, # options: [None, "lognorm"]
+        "processing": None, # options: [None, "lognorm", "binarize"]
         "ct_key": "celltype", # only relevant if e.g. n_cts is specified
         "n_cts" : None,
         "cells_per_ct_n_seeds" : 1, # Pseudo parameter

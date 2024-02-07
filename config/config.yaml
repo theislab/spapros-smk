@@ -15,22 +15,34 @@ PRELIMINARY_EVAL_SUMMARY: False # Whether to just summarise the currently availa
 selections:
   batch_test:
     datasets: [adata_test]
-    #dataset_param:
-    #  cells_per_ct_n_seeds : [4]
+    dataset_param:
+      processing: ["binarize"]
     selection_param:
-      n: [25] #[5] #[75]  #,100,150]
-      method_specific_processing: [True] #[True, False]
+      n: [25] 
+      method_specific_processing: [False] #[True, False]
       "gene_key": ["highly_variable"]
     methods:
-      DE
-      pca
-      #spapros
-      #scgenefit
-      #nsforest
-      #scmer
-      #smash
-      #asfs
-      #cosg
+      spapros
+      #DE
+      #pca
+#  batch_test:
+#    datasets: [adata_test]
+#    #dataset_param:
+#    #  cells_per_ct_n_seeds : [4]
+#    selection_param:
+#      n: [25] #[5] #[75]  #,100,150]
+#      method_specific_processing: [True] #[True, False]
+#      "gene_key": ["highly_variable"]
+#    methods:
+#      DE
+#      pca
+#      #spapros
+#      #scgenefit
+#      #nsforest
+#      #scmer
+#      #smash
+#      #asfs
+#      #cosg
 #  batch_test2:
 #    datasets: [adata_test]
 #    dataset_param:

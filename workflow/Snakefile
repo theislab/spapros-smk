@@ -165,7 +165,8 @@ rule selection_persist:
         partition="gpu_p",
         qos="gpu_normal",
         mem_mb=64000,
-        gres="gpu:1" 
+        gpu=1
+        #gres="gpu:1" 
     log:
         "logs/selections/persist_{selection_id}_{dataset}_{data_id}.txt"
     params:
@@ -194,7 +195,8 @@ rule selection_persistus: # persist with unsupervised optimisation
         partition="gpu_p",
         qos="gpu_normal",
         mem_mb=64000,
-        gres="gpu:1"        
+        gpu=1
+        #gres="gpu:1"        
     log:
         "logs/selections/persistus_{selection_id}_{dataset}_{data_id}.txt"
     params:

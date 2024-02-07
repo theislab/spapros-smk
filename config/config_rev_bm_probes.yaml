@@ -53,8 +53,8 @@ selections:
       n: [50] #,150]
     methods:
       smash
-      #persist
-      #persistus
+      persist
+      persistus
   batch_bm_2:
     datasets: [Madissoon2019_w_cts] #, Litvinukova2020_w_cts]
     dataset_param:

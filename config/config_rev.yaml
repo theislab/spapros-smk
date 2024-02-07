@@ -102,6 +102,18 @@ selections:
       genebasis
       persist
       persistus
+  batch6.1_spapros_bin:
+    datasets: [2019Hodge_sn_human_brain_MTG_min20perct]
+    dataset_param:
+      bootstrap_n_seeds: [7]
+      processing: ["binarize"]
+    selection_param:
+      n: [50,150]
+      gene_key: ["merfish_gene"] #[None, "merfish_gene"]
+      method_specific_processing: [False]
+    methods:
+      spapros
+      spaproscto
   batch6.2.1:
     datasets: [merfish_MTG_no_vessels]
     dataset_param:
@@ -244,7 +256,7 @@ evaluations:
       ct_key: [clean_type, cluster_L3]
     metrics: [knn_overlap, forest_clfs]
   eval_batch6.1:
-    batches: [batch6.1, batch6.2.1]
+    batches: [batch6.1, batch6.2.1, batch6.1_spapros_bin]
     selection_dataset: False
     datasets: [2019Hodge_sn_human_brain_MTG_min20perct]
     dataset_param:
@@ -252,7 +264,7 @@ evaluations:
       ct_key: [celltype]
     metrics: [cluster_similarity, knn_overlap, forest_clfs]
   eval_batch6.2.1:
-    batches: [batch6.1, batch6.2.1]
+    batches: [batch6.1, batch6.2.1, batch6.1_spapros_bin]
     selection_dataset: False
     datasets: [merfish_MTG_no_vessels]
     dataset_param:
@@ -260,7 +272,7 @@ evaluations:
       ct_key: [clean_type]
     metrics: [cluster_similarity, knn_overlap, forest_clfs]
   eval_batch6.2.2:
-    batches: [batch6.2.1, batch6.2.2]
+    batches: [batch6.2.1, batch6.2.2, batch6.1_spapros_bin]
     selection_dataset: False
     datasets: [merfish_MTG_no_vessels]
     dataset_param:

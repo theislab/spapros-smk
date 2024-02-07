@@ -1,4 +1,5 @@
 import argparse
+import numpy as np
 import pandas as pd
 import scanpy as sc
 from scipy.sparse import issparse, csr_matrix
@@ -54,6 +55,9 @@ def main():
         normalise(adata)
         sc.pp.log1p(adata)
         adata.uns["processing"] = "lognorm"
+    elif processing == "binarize":
+        adata.X = (adata.X>0).astype(np.float32)
+        adata.uns["processing"] = "binarize"
     else:
         adata.uns["processing"] = "raw"
     
